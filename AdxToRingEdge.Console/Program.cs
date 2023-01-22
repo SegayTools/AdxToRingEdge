@@ -2,48 +2,21 @@
 using AdxToRingEdge.Core;
 using CommandLine;
 using AdxToRingEdge.Core.TouchPanel;
+using AdxToRingEdge.Core.Collections;
 
 Console.WriteLine("PROGRAM BEGIN.");
 
-CommandArgOption ParseCommands()
-{
-    var p = Parser.Default.ParseArguments<CommandArgOption>(args);
-
-    if (p.Errors.Any())
-    {
-        Console.WriteLine($"Wrong args : {string.Join(", ", args)}");
-        Console.WriteLine(string.Join(Environment.NewLine, p.Errors.Select(x => x.ToString())));
-        return default;
-    }
-
-    return p.Value;
-}
-
-if (ParseCommands() is not CommandArgOption option)
-    return;
+if (!CommandArgOption.Build(args))
+return;
 
 Console.WriteLine(Environment.NewLine + "-----Dump Full Options-----");
-Console.WriteLine(Parser.Default.FormatCommandLine(option));
+Console.WriteLine(Parser.Default.FormatCommandLine(CommandArgOption.Instance));
 Console.WriteLine("---------------------------" + Environment.NewLine);
 
-Console.WriteLine("SERVICE BEGIN.");
+var manager = new ServiceManager();
+manager.Start();
 
-var services = new IService[] {
-    new TouchPanelService(option),
-    new KeyboardService(option)
-};
+while (Console.ReadLine().ToLower() != "exit")
+Thread.Sleep(0);
 
-foreach (var service in services)
-{
-    try
-    {
-        service.Start();
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine($"Start service {service.GetType().Name} failed : {e.Message}");
-    }
-}
-
-while (true)
-    Thread.Sleep(0);
+manager.Stop();

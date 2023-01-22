@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AdxToRingEdge.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "--disableKeyboard --debug --adxCOM COM13 --maiCOM COM14"
+    }
+  }
+}

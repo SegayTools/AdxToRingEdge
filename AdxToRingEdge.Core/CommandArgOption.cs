@@ -29,6 +29,9 @@ namespace AdxToRingEdge.Core
         [Option("adxCOM", Required = false, Default = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00")]
         public string AdxCOM { get; set; }
 
+        [Option("dunnyMaiCOM", Required = false)]
+        public string DunnyMaiCOM { get; set; }
+
         [Option("maiBaudRate", Required = false)]
         public int MaiBaudRate { get; set; } = 9600;
 
@@ -61,5 +64,44 @@ namespace AdxToRingEdge.Core
         public IEnumerable<string> OverrideKeycodeToButtons { get; set; }
 
         #endregion
+
+        #region General
+
+        [Option("debug", Default = false, Required = false)]
+        public bool IsDebug { get; set; }
+
+        [Option("debugSerialRead", Default = false, Required = false)]
+        public bool DebugSerialRead { get; set; }
+
+        [Option("logSerialRead", Default = false, Required = false)]
+        public bool LogSerialRead { get; set; }
+
+        [Option("disableKeyboard", Default = false, Required = false)]
+        public bool DisableKeyboardService { get; set; }
+
+        [Option("disableTouchPanelService", Default = false, Required = false)]
+        public bool DisableTouchPanelService { get; set; }
+
+        [Option("enableDunny2PTouchPanel", Required = false, Default = false)]
+        public bool EnableDunny2PTouchPanel { get; set; } = false;
+
+        #endregion
+
+        public static CommandArgOption Instance { get; internal set; }
+
+        public static bool Build(string[] args)
+        {
+            var p = Parser.Default.ParseArguments<CommandArgOption>(args);
+
+            if (p.Errors.Any())
+            {
+                Console.WriteLine($"Wrong args : {string.Join(", ", args)}");
+                Console.WriteLine(string.Join(Environment.NewLine, p.Errors.Select(x => x.ToString())));
+                return default;
+            }
+
+            Instance = p.Value;
+            return p.Value is not null;
+        }
     }
 }

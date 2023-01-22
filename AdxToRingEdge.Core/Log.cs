@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,7 +49,12 @@ namespace AdxToRingEdge.Core
             Console.ForegroundColor = b;
         }
 
-        public void Debug(string tag, string message) => Output(LogType.Debug, tag, message);
+        public void Debug(string tag, string message)
+        {
+            if (CommandArgOption.Instance.IsDebug)
+                Output(LogType.Debug, tag, message);
+        }
+
         public void User(string tag, string message) => Output(LogType.User, tag, message);
         public void Warn(string tag, string message) => Output(LogType.Warning, tag, message);
         public void Error(string tag, string message) => Output(LogType.Error, tag, message);

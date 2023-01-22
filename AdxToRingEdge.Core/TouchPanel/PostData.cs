@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core.TouchPanel
 {
-    public class PostData : IDisposable
+    public struct PostData : IDisposable
     {
         private byte[] buffer;
 

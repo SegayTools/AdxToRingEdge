@@ -16,10 +16,10 @@ namespace AdxToRingEdge.Core.Keyboard
         private readonly ButtonController buttonController;
         private CancellationTokenSource cancelSource;
 
-        public KeyboardService(CommandArgOption option)
+        public KeyboardService()
         {
-            this.option = option;
-            this.buttonController = new ButtonController(option);
+            option = CommandArgOption.Instance;
+            buttonController = new ButtonController(option);
         }
 
         public void Start()

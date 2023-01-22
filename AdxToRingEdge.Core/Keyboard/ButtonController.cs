@@ -40,6 +40,11 @@ namespace AdxToRingEdge.Core.Keyboard
             foreach (var pin in buttonMap.Values)
                 gpioController.OpenPin(pin, PinMode.Output);
 
+            //reset default
+            foreach (var button in buttonMap.Keys)
+                SetButtonState(button, default);
+            Log.Debug($"Buttons were reset.");
+
             cachedPinState.Clear();
         }
 
@@ -128,8 +133,8 @@ namespace AdxToRingEdge.Core.Keyboard
             LogEntity.Debug($"[{button} -> pin:{pin} : {(isPressed ? "Pressed" : "Released")}]");
         }
 
-        public void Dispose() 
-        { 
+        public void Dispose()
+        {
             gpioController.Dispose();
         }
     }

@@ -1,4 +1,5 @@
-﻿using AdxToRingEdge.Core.TouchPanel.Base;
+﻿using AdxToRingEdge.Core.Collections;
+using AdxToRingEdge.Core.TouchPanel.Base;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -7,11 +8,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TouchPanelService>;
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TouchPanel1PService>;
 
 namespace AdxToRingEdge.Core.TouchPanel
 {
-    public class TouchPanelService : IService
+    public class TouchPanel1PService : TouchPanelServiceBase
     {
         private TouchAreaMap convertMap = new TouchAreaMap(DefaultTouchMapImpl.DxTouchMap, DefaultTouchMapImpl.FinaleTouchMap);
 
@@ -19,41 +20,13 @@ namespace AdxToRingEdge.Core.TouchPanel
 
         private Queue<PostData> postDataQueue = new();
         private CancellationTokenSource cancelSource;
-        private List<SerialPort> registeredSerials = new();
+        private List<SerialStreamWrapper> registeredSerials = new();
         private bool isFinaleInit = false;
         private byte[] finaleTouchDataBuffer = new byte[14];
 
-        public TouchPanelService(CommandArgOption option)
+        public TouchPanel1PService()
         {
-            this.option = option;
-        }
-
-        SerialPort SetupSerial(string comName, int baudRate, Parity parity, int dataBits, StopBits stopBits)
-        {
-            lock (this)
-            {
-                LogEntity.Debug("-------SerialPort Setup------");
-                LogEntity.Debug($"comName = {comName}");
-                LogEntity.Debug($"baudRate  = {baudRate}");
-                LogEntity.Debug($"parity = {parity}");
-                LogEntity.Debug($"dataBits = {dataBits}");
-                LogEntity.Debug($"stopBits = {stopBits}");
-                LogEntity.Debug("-----------------------------");
-            }
-
-            try
-            {
-
-                SerialPort inputSerial = new SerialPort(comName, baudRate, parity, dataBits, stopBits);
-                inputSerial.Open();
-                LogEntity.User($"Setup serial {comName} successfully.");
-                return inputSerial;
-            }
-            catch (Exception e)
-            {
-                LogEntity.Error($"Can't setup serial {comName} : {e.Message}");
-                return default;
-            }
+            option = CommandArgOption.Instance;
         }
 
         private void PostDataToOutput(PostData data)
@@ -63,7 +36,7 @@ namespace AdxToRingEdge.Core.TouchPanel
 
         void OnADXProcess(CancellationToken cancellationToken)
         {
-            if (SetupSerial(option.AdxCOM, option.AdxBaudRate, option.AdxParity, option.AdxDataBits, option.AdxStopBits) is not SerialPort serial)
+            if (SetupSerial(option.AdxCOM, option.AdxBaudRate, option.AdxParity, option.AdxDataBits, option.AdxStopBits) is not SerialStreamWrapper serial)
             {
                 cancelSource?.Cancel();
                 return;
@@ -125,7 +98,7 @@ namespace AdxToRingEdge.Core.TouchPanel
         {
             LogEntity.User($"Begin OnFinaleProcess()");
 
-            if (SetupSerial(option.MaiCOM, option.MaiBaudRate, option.MaiParity, option.MaiDataBits, option.MaiStopBits) is not SerialPort serial)
+            if (SetupSerial(option.MaiCOM, option.MaiBaudRate, option.MaiParity, option.MaiDataBits, option.MaiStopBits) is not SerialStreamWrapper serial)
             {
                 cancelSource?.Cancel();
                 return;
@@ -137,54 +110,76 @@ namespace AdxToRingEdge.Core.TouchPanel
 
             void OnRead()
             {
-                var packets = new byte[24];
                 LogEntity.User($"Begin OnFinaleProcess.OnRead()");
-                byte ch = default;
+
+                byte ch = 50;
+                var recvBuffer = new byte[64];
+                var recvDataBuffer = new CircularArray<byte>(6);
 
                 try
                 {
                     while (!cancellationToken.IsCancellationRequested)
                     {
-                        var head = serial.ReadByte();
-                        switch (head)
+                        var recvRead = serial.Read(recvBuffer, 0, recvBuffer.Length);
+                        for (int i = 0; i < recvRead; i++)
                         {
-                            case 0x7B:
-                                LogEntity.Debug($"OnFinaleProcess() recv 0x7B");
-                                serial.Read(packets, 1, 5);
-                                LogEntity.Debug($"OnFinaleProcess() 0x7B -> packets[3] = {(TouchSensorStat)packets[3]}");
-                                switch (packets[3])
+                            var readByte = recvBuffer[i];
+                            recvDataBuffer.Enqueue(readByte);
+
+                            if (recvDataBuffer[0] == '{' && recvDataBuffer[^1] == '}')
+                            {
+                                //recv command
+                                var statCmd = recvDataBuffer[3];
+                                LogEntity.Debug($"OnFinaleProcess() recv command, statCmd = {(char)statCmd} {(TouchSensorStat)statCmd} (0x{statCmd:X2})");
+
+                                switch (statCmd)
                                 {
                                     case (byte)TouchSensorStat.Sens:
-                                        PostDataToOutput(PostData.CreateWithCopy(new byte[] { 0x28, packets[1], packets[2], packets[3], packets[4], 0x29 }));
-                                        ch = packets[4];
-                                        LogEntity.Debug($"OnFinaleProcess() ch = {ch}");
+                                        {
+                                            var postData = new PostData(6);
+                                            recvDataBuffer.Fill(postData.Data.Slice(1, 4));
+                                            postData.Data.Span[0] = 0x28;
+                                            postData.Data.Span[5] = 0x29;
+                                            PostDataToOutput(postData);
+                                            ch = recvDataBuffer[4];
+                                        }
                                         break;
-                                    case (byte)TouchSensorStat.Ratio:
-                                        PostDataToOutput(PostData.CreateWithCopy(new byte[] { 0x28, packets[1], packets[2], packets[3], ch, 0x29 }));
-                                        break;
-                                    case (byte)TouchSensorStat.STAT:
-                                        if (option.MaiWriteDelay >= 0)
-                                            Thread.Sleep(option.MaiWriteDelay);
-                                        isFinaleInit = true;
 
-                                        Array.Clear(finaleTouchDataBuffer);
+                                    case (byte)TouchSensorStat.RatioDX:
+                                    case (byte)TouchSensorStat.Ratio:
+                                        {
+                                            var postData = new PostData(6);
+                                            recvDataBuffer.Fill(postData.Data.Slice(1, 3));
+                                            postData.Data.Span[0] = 0x28;
+                                            postData.Data.Span[4] = ch;
+                                            postData.Data.Span[5] = 0x29;
+                                            PostDataToOutput(postData);
+                                        }
+                                        break;
+
+                                    case (byte)TouchSensorStat.STAT:
+                                        isFinaleInit = true;
+                                        break;
+
+                                    case (byte)TouchSensorStat.HALT:
+                                        ch = default;
+                                        isFinaleInit = false;
+                                        break;
+
+                                    case (byte)TouchSensorStat.RSET:
+                                        Buffer.SetByte(finaleTouchDataBuffer, 0, 0x40);
                                         finaleTouchDataBuffer[0] = 0x28;
                                         finaleTouchDataBuffer[^1] = 0x29;
                                         break;
-                                    case (byte)TouchSensorStat.HALT:
-                                        isFinaleInit = false;
-                                        Array.Clear(packets, 0, packets.Length);
-                                        ch = default;
-                                        break;
+
                                     default:
+                                        LogEntity.Debug($"OnFinaleProcess() unknown command, command buffer : {string.Join(string.Empty, Enumerable.Range(0, recvDataBuffer.Capacity).Select(x => (char)recvDataBuffer[x]))}");
                                         break;
                                 }
-                                break;
-                            default:
-                                LogEntity.Warn($"OnFinaleProcess() unknown byte {head:X2}");
-                                break;
+                            }
                         }
                     }
+
                     LogEntity.User($"End OnFinaleProcess.OnRead()");
                 }
                 catch (Exception e)
@@ -220,7 +215,7 @@ namespace AdxToRingEdge.Core.TouchPanel
                 LogEntity.User($"End OnFinaleProcess.OnWrite()");
             }
 
-            try 
+            try
             {
                 await Task.WhenAll(Task.Run(() => OnWrite(), cancellationToken), Task.Run(() => OnRead(), cancellationToken));
             }
@@ -233,7 +228,7 @@ namespace AdxToRingEdge.Core.TouchPanel
         }
 
 
-        public void Start()
+        public override void Start()
         {
             if (cancelSource is not null)
             {
@@ -246,7 +241,7 @@ namespace AdxToRingEdge.Core.TouchPanel
             LogEntity.User("start!");
         }
 
-        public void Stop()
+        public override void Stop()
         {
             cancelSource.Cancel();
             cancelSource = default;
@@ -259,11 +254,6 @@ namespace AdxToRingEdge.Core.TouchPanel
             postDataQueue.Clear();
             isFinaleInit = false;
             LogEntity.User("stop!");
-        }
-
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }
