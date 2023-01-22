@@ -25,16 +25,19 @@ namespace AdxToRingEdge.Core
 
             services.Clear();
 
-            if (!CommandArgOption.Instance.DisableKeyboardService)
+            if (!string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxKeyboardByIdPath))
                 services.Add(new KeyboardService());
 
-            if (!CommandArgOption.Instance.DisableTouchPanelService)
-            {
+            if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(CommandArgOption.Instance.MaiCOM)))
                 services.Add(new TouchPanel1PService());
 
-                if (CommandArgOption.Instance.EnableDunny2PTouchPanel)
-                    services.Add(new TouchPanel2PService());
-            }
+            if (!string.IsNullOrWhiteSpace(CommandArgOption.Instance.dummyCOM))
+                services.Add(new TouchPanel2PService());
+
+            LogEntity.Debug($"------Service List-------");
+            foreach (var service in services)
+                LogEntity.Debug($"* {service.GetType().Name}");
+            LogEntity.Debug($"-----------------");
 
             foreach (var service in services)
             {

@@ -198,8 +198,6 @@ namespace AdxToRingEdge.Core.TouchPanel
                         using var postData = postDataQueue.Dequeue();
                         if (MemoryMarshal.TryGetArray<byte>(postData.Data, out var seg))
                         {
-                            if (option.MaiWriteDelay >= 0)
-                                Thread.Sleep(option.MaiWriteDelay);
                             serial.Write(seg.Array, 0, postData.Data.Length);
                             //LogEntity.Debug($"OnFinaleProcess.OnWrite() post data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => $"{x:X2}"))}");
                         }

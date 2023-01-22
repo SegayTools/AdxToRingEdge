@@ -26,8 +26,8 @@ namespace AdxToRingEdge.Core
         [Option("adxStopBits", Required = false)]
         public StopBits AdxStopBits { get; set; } = StopBits.One;
 
-        [Option("adxCOM", Required = false, Default = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00")]
-        public string AdxCOM { get; set; }
+        [Option("adxCOM", Required = false)]
+        public string AdxCOM { get; set; } // = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00"
 
         [Option("dunnyMaiCOM", Required = false)]
         public string DunnyMaiCOM { get; set; }
@@ -44,18 +44,18 @@ namespace AdxToRingEdge.Core
         [Option("maiStopBits", Required = false)]
         public StopBits MaiStopBits { get; set; } = StopBits.One;
 
-        [Option("maiCOM", Required = false, Default = "/dev/ttyAMA0")]
-        public string MaiCOM { get; set; }
+        [Option("maiCOM", Required = false)]
+        public string MaiCOM { get; set; } // = "/dev/ttyAMA0"
 
-        [Option("maiWriteDelay", Required = false, Default = -1)]
-        public int MaiWriteDelay { get; set; } = -1;
+        [Option("dummyCOM", Required = false)]
+        public string dummyCOM { get; set; }
 
         #endregion
 
         #region Keyboard
 
-        [Option("adxKeyboardByIdPath", Required = false, Default = "/dev/input/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if02-event-kbd")]
-        public string AdxKeyboardByIdPath { get; set; }
+        [Option("adxKeyboardByIdPath", Required = false)]
+        public string AdxKeyboardByIdPath { get; set; } // = "/dev/input/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if02-event-kbd"
 
         [Option("overrideButtonToPins", Required = false, Separator = ';')]
         public IEnumerable<string> OverrideButtonToPins { get; set; }
@@ -75,15 +75,6 @@ namespace AdxToRingEdge.Core
 
         [Option("logSerialRead", Default = false, Required = false)]
         public bool LogSerialRead { get; set; }
-
-        [Option("disableKeyboard", Default = false, Required = false)]
-        public bool DisableKeyboardService { get; set; }
-
-        [Option("disableTouchPanelService", Default = false, Required = false)]
-        public bool DisableTouchPanelService { get; set; }
-
-        [Option("enableDunny2PTouchPanel", Required = false, Default = false)]
-        public bool EnableDunny2PTouchPanel { get; set; } = false;
 
         #endregion
 
