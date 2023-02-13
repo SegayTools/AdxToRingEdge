@@ -64,11 +64,13 @@ namespace AdxToRingEdge.Core
     {
         public static ILog Impl { internal get; set; } = new DefaultConsoleLog();
 
+        [Conditional("DEBUG")]
         public static void Debug(string tag, string message) => Impl?.Debug(tag, message);
         public static void User(string tag, string message) => Impl?.User(tag, message);
         public static void Warn(string tag, string message) => Impl?.Warn(tag, message);
         public static void Error(string tag, string message) => Impl?.Error(tag, message);
 
+        [Conditional("DEBUG")]
         public static void Debug(string message) => Impl?.Debug(string.Empty, message);
         public static void User(string message) => Impl?.User(string.Empty, message);
         public static void Warn(string message) => Impl?.Warn(string.Empty, message);
@@ -80,6 +82,7 @@ namespace AdxToRingEdge.Core
         private static readonly string TAG;
         static Log() => TAG = typeof(T).Name;
 
+        [Conditional("DEBUG")]
         public static void Debug(string message) => Log.Debug(TAG, message);
         public static void User(string message) => Log.User(TAG, message);
         public static void Warn(string message) => Log.Warn(TAG, message);

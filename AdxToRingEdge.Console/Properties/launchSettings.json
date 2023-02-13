@@ -2,7 +2,7 @@
   "profiles": {
     "AdxToRingEdge.Console": {
       "commandName": "Project",
-      "commandLineArgs": "--debug --adxCOM COM13 --maiCOM COM14"
+      "commandLineArgs": "--debug --adxCOM COM3 --maiCOM COM14 --adxKeyboardByIdPath \"\""
     }
   }
 }

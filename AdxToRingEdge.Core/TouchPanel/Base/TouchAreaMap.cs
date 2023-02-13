@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,9 +20,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
 
         public void MapData(byte[] fromData, byte[] toData)
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool isTouch(byte[] data, TouchAreaBinaryLocation loc)
                 => (data[loc.PacketIdx] & loc.Bit) == loc.Bit;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             void applyTouch(byte[] data, TouchAreaBinaryLocation loc)
                 => data[loc.PacketIdx] = (byte)(data[loc.PacketIdx] | loc.Bit);
 

@@ -27,7 +27,7 @@ namespace AdxToRingEdge.Core
         public StopBits AdxStopBits { get; set; } = StopBits.One;
 
         [Option("adxCOM", Required = false)]
-        public string AdxCOM { get; set; } // = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00"
+        public string AdxCOM { get; set; } = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00";
 
         [Option("dunnyMaiCOM", Required = false)]
         public string DunnyMaiCOM { get; set; }
@@ -45,17 +45,14 @@ namespace AdxToRingEdge.Core
         public StopBits MaiStopBits { get; set; } = StopBits.One;
 
         [Option("maiCOM", Required = false)]
-        public string MaiCOM { get; set; } // = "/dev/ttyAMA0"
-
-        [Option("dummyCOM", Required = false)]
-        public string dummyCOM { get; set; }
+        public string MaiCOM { get; set; } = "/dev/ttyAMA0";
 
         #endregion
 
         #region Keyboard
 
         [Option("adxKeyboardByIdPath", Required = false)]
-        public string AdxKeyboardByIdPath { get; set; } // = "/dev/input/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if02-event-kbd"
+        public string AdxKeyboardByIdPath { get; set; } = "/dev/input/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if02-event-kbd";
 
         [Option("overrideButtonToPins", Required = false, Separator = ';')]
         public IEnumerable<string> OverrideButtonToPins { get; set; }

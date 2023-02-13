@@ -50,8 +50,8 @@ namespace AdxToRingEdge.Core.Collections
 
             var arrMem = array.AsMemory();
 
-            arrMem.Slice(baseIdx, array.Length - baseIdx).CopyTo(buffer);
-            arrMem.Slice(0, baseIdx).CopyTo(buffer.Slice(array.Length - baseIdx));
+            arrMem.Slice(baseIdx, Math.Min(array.Length - baseIdx, buffer.Length)).CopyTo(buffer);
+            arrMem.Slice(0, baseIdx).CopyTo(buffer.Slice(Math.Min(array.Length - baseIdx, buffer.Length)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

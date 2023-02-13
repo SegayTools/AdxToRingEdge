@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TouchPanel1PService>;
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TouchPanelService>;
 
 namespace AdxToRingEdge.Core.TouchPanel
 {
-    public class TouchPanel1PService : TouchPanelServiceBase
+    public class TouchPanelService : TouchPanelServiceBase
     {
         private TouchAreaMap convertMap = new TouchAreaMap(DefaultTouchMapImpl.DxTouchMap, DefaultTouchMapImpl.FinaleTouchMap);
 
@@ -24,7 +24,7 @@ namespace AdxToRingEdge.Core.TouchPanel
         private bool isFinaleInit = false;
         private byte[] finaleTouchDataBuffer = new byte[14];
 
-        public TouchPanel1PService()
+        public TouchPanelService()
         {
             option = CommandArgOption.Instance;
         }
@@ -70,7 +70,7 @@ namespace AdxToRingEdge.Core.TouchPanel
                             inputBuffer[0] = 0x28;
                             serial.Read(inputBuffer, 1, 8);
 
-                            if (inputBuffer[8] == 0x29 && isFinaleInit)
+                            if (inputBuffer[8] == 0x29)
                             {
                                 //LogEntity.Debug($"OnADXProcess.OnRead() post data : {string.Join(" ", inputBuffer.Select(x => $"{x:X2}"))}");
 
@@ -129,19 +129,23 @@ namespace AdxToRingEdge.Core.TouchPanel
                             if (recvDataBuffer[0] == '{' && recvDataBuffer[^1] == '}')
                             {
                                 //recv command
+                                var monitorIdx = recvBuffer[1];
+                                var sensor = recvBuffer[2];
                                 var statCmd = recvDataBuffer[3];
-                                LogEntity.Debug($"OnFinaleProcess() recv command, statCmd = {(char)statCmd} {(TouchSensorStat)statCmd} (0x{statCmd:X2})");
+
+                                LogEntity.Debug($"OnFinaleProcess() recv command, monitor = {(monitorIdx == 'L' ? "Left" : "Right")}, sensor = {sensor}, statCmd = {(char)statCmd} {(TouchSensorStat)statCmd} (0x{statCmd:X2})");
 
                                 switch (statCmd)
                                 {
                                     case (byte)TouchSensorStat.Sens:
                                         {
                                             var postData = new PostData(6);
-                                            recvDataBuffer.Fill(postData.Data.Slice(1, 4));
+                                            recvDataBuffer.Fill(postData.Data);
                                             postData.Data.Span[0] = 0x28;
                                             postData.Data.Span[5] = 0x29;
                                             PostDataToOutput(postData);
                                             ch = recvDataBuffer[4];
+                                            LogEntity.Debug($"OnFinaleProcess() set sensor = {ch}");
                                         }
                                         break;
 
@@ -149,7 +153,7 @@ namespace AdxToRingEdge.Core.TouchPanel
                                     case (byte)TouchSensorStat.Ratio:
                                         {
                                             var postData = new PostData(6);
-                                            recvDataBuffer.Fill(postData.Data.Slice(1, 3));
+                                            recvDataBuffer.Fill(postData.Data);
                                             postData.Data.Span[0] = 0x28;
                                             postData.Data.Span[4] = ch;
                                             postData.Data.Span[5] = 0x29;
@@ -158,11 +162,13 @@ namespace AdxToRingEdge.Core.TouchPanel
                                         break;
 
                                     case (byte)TouchSensorStat.STAT:
+                                        LogEntity.User($"OnFinaleProcess() start to send touch data");
                                         isFinaleInit = true;
                                         break;
 
                                     case (byte)TouchSensorStat.HALT:
-                                        ch = default;
+                                        LogEntity.User($"OnFinaleProcess() stop sending touch data");
+                                        ch = 50;
                                         isFinaleInit = false;
                                         break;
 
@@ -184,7 +190,7 @@ namespace AdxToRingEdge.Core.TouchPanel
                 }
                 catch (Exception e)
                 {
-                    LogEntity.Error($"End OnFinaleProcess.OnRead() by exception : {e.Message}");
+                    LogEntity.Error($"End OnFinaleProcess.OnRead() by exception : {e.Message}\n{e.StackTrace}");
                 }
             }
 
@@ -199,7 +205,7 @@ namespace AdxToRingEdge.Core.TouchPanel
                         if (MemoryMarshal.TryGetArray<byte>(postData.Data, out var seg))
                         {
                             serial.Write(seg.Array, 0, postData.Data.Length);
-                            //LogEntity.Debug($"OnFinaleProcess.OnWrite() post data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => $"{x:X2}"))}");
+                            LogEntity.Debug($"OnFinaleProcess.OnWrite() post initalization data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => (char)x))}");
                         }
                     }
 
@@ -234,9 +240,15 @@ namespace AdxToRingEdge.Core.TouchPanel
                 return;
             }
             cancelSource = new CancellationTokenSource();
+            TryOptimzeSerials();
             Task.Run(() => OnADXProcess(cancelSource.Token), cancelSource.Token);
             Task.Run(() => OnFinaleProcess(cancelSource.Token), cancelSource.Token);
             LogEntity.User("start!");
+        }
+
+        private void TryOptimzeSerials()
+        {
+
         }
 
         public override void Stop()

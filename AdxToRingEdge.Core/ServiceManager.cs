@@ -29,10 +29,7 @@ namespace AdxToRingEdge.Core
                 services.Add(new KeyboardService());
 
             if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(CommandArgOption.Instance.MaiCOM)))
-                services.Add(new TouchPanel1PService());
-
-            if (!string.IsNullOrWhiteSpace(CommandArgOption.Instance.dummyCOM))
-                services.Add(new TouchPanel2PService());
+                services.Add(new TouchPanelService());
 
             LogEntity.Debug($"------Service List-------");
             foreach (var service in services)

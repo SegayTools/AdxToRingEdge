@@ -9,10 +9,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
     public enum TouchSensorStat
     {
         RSET = 0x45,
-        HALT = 0x4C,//初始化开始
-        Ratio = 0x74,//设置数值
+        HALT = 'L',//初始化开始
+        Ratio = 't',//设置数值(对于旧框)
         RatioDX = 0x72,//设置数值(对于新框)
-        Sens = 0x6B,//设置数值
-        STAT = 0x41,//初始化完成，可以发送触摸数据
+        Sens = 'k',//设置数值
+        STAT = 'A',//初始化完成，可以发送触摸数据
     }
 }
