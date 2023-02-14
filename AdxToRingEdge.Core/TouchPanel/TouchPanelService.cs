@@ -25,7 +25,6 @@ namespace AdxToRingEdge.Core.TouchPanel
         private List<SerialStreamWrapper> registeredSerials = new();
         private bool isFinaleInit = false;
         private byte[] finaleTouchDataBuffer = new byte[14];
-        private SerialStreamWrapper currentAdxSerial;
 
         public TouchPanelService()
         {
@@ -47,7 +46,6 @@ namespace AdxToRingEdge.Core.TouchPanel
             lock (registeredSerials)
             {
                 registeredSerials.Add(serial);
-                currentAdxSerial = serial;
             }
 
             var inputBuffer = new CircularArray<byte>(9);
@@ -76,9 +74,8 @@ namespace AdxToRingEdge.Core.TouchPanel
                     //readBuffer.CheckSize(avaliableReadBytesCount);
 
                     var actualReadBytesCount = serial.ReadAtLast(readBuffer);
-                    var baseIndex = actualReadBytesCount - Math.Min(18, actualReadBytesCount);
 
-                    for (int r = baseIndex; r < actualReadBytesCount; r++)
+                    for (int r = 0; r < actualReadBytesCount; r++)
                     {
                         inputBuffer.Enqueue(readBuffer[r]);
 
@@ -230,6 +227,7 @@ namespace AdxToRingEdge.Core.TouchPanel
 
                     if (isFinaleInit)
                     {
+                        //这里可以保证发送的数据是最新最热的，手动避免serial buffer堆积
                         if (serial.BytesToWrite > finaleTouchDataBuffer.Length * 2)
                             continue;
                         //output converted touch data.
