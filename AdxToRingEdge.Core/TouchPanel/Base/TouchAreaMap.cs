@@ -9,10 +9,12 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
 {
     public class TouchAreaMap
     {
-        private readonly Dictionary<TouchArea, TouchAreaBinaryLocation> fromMap;
-        private readonly Dictionary<TouchArea, TouchAreaBinaryLocation> toMap;
+        private readonly IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> fromMap;
+        private readonly IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> toMap;
+        //private byte[] prevBuffer = new byte[9];
+        //private StringBuilder sb = new StringBuilder();
 
-        public TouchAreaMap(Dictionary<TouchArea, TouchAreaBinaryLocation> from, Dictionary<TouchArea, TouchAreaBinaryLocation> to)
+        public TouchAreaMap(IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> from, IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> to)
         {
             fromMap = from;
             toMap = to;
@@ -28,18 +30,33 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
             void applyTouch(byte[] data, TouchAreaBinaryLocation loc)
                 => data[loc.PacketIdx] = (byte)(data[loc.PacketIdx] | loc.Bit);
 
+            //sb.Clear();
+
             foreach (var pair in fromMap)
             {
                 var touchArea = pair.Key;
                 var fromLoc = pair.Value;
 
-                if (isTouch(fromData, fromLoc))
+                var curIsTouch = isTouch(fromData, fromLoc);
+                //var prevIsTouch = isTouch(prevBuffer, fromLoc);
+
+                if (curIsTouch)
                 {
                     //映射到toData
                     var toLoc = toMap[touchArea];
                     applyTouch(toData, toLoc);
                 }
+                /*
+                if (prevIsTouch != curIsTouch)
+                    sb.Append($"[{touchArea}] {(curIsTouch ? "Touched" : "Released")} ; ");
+                */
             }
+            /*
+            Array.Copy(fromData, prevBuffer, fromData.Length);
+
+            if (sb.Length > 0)
+                Log.User(sb.ToString());
+            */
         }
     }
 

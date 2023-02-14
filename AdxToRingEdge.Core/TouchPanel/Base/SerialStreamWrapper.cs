@@ -12,38 +12,24 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
     public class SerialStreamWrapper : IDisposable
     {
         private SerialPort serial;
-        private StreamWriter binLogger;
-        private bool enableDebugSerialRead;
+
+        public int BytesToRead => serial.BytesToRead;
+        public int BytesToWrite => serial.BytesToWrite;
 
         public SerialStreamWrapper(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits)
         {
             serial = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
-            enableDebugSerialRead = CommandArgOption.Instance.DebugSerialRead;
-
-            if (enableDebugSerialRead)
-            {
-                var filePath = Path.Combine($"{portName.GetHashCode()}.hexLog");
-                binLogger = new StreamWriter(File.OpenWrite(filePath));
-                binLogger.WriteLine(DateTime.Now.ToString());
-
-                Log.Debug($"Output {portName} to {filePath}");
-            }
         }
 
         public void Dispose()
         {
             serial?.Dispose();
             serial = null;
-            binLogger?.WriteLine("--------CLOSE()--------");
-            binLogger?.Flush();
-            binLogger?.Dispose();
-            binLogger = null;
         }
 
         public void Open()
         {
             serial.Open();
-            binLogger?.WriteLine("--------OPEN()--------");
         }
 
         private void Debug(string s)
@@ -57,28 +43,18 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         public int Read(byte[] buffer, int offset, int length)
         {
             var read = serial.Read(buffer, offset, length);
+            return read;
+        }
 
-            if (enableDebugSerialRead && read > 0)
-            {
-                var s = " " + string.Join(" ", buffer.Skip(offset).Take(read).Select(x => x.ToString("X2")));
-                binLogger?.Write(s);
-                Debug(s);
-            }
-
+        public int ReadAtLast(byte[] buffer)
+        {
+            var read = serial.BaseStream.ReadAtLeast(buffer, buffer.Length, false);
             return read;
         }
 
         public int ReadByte()
         {
             var b = serial.ReadByte();
-
-            if (enableDebugSerialRead)
-            {
-                var s = " " + b.ToString("X2");
-                binLogger?.Write(s);
-                Debug(s);
-            }
-
             return b;
         }
 

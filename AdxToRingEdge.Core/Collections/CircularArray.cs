@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core.Collections
 {
-    public class CircularArray<T>
+    public class CircularArray<T> : IEnumerable<T>
     {
         private T[] array;
         private int count;
@@ -66,6 +66,16 @@ namespace AdxToRingEdge.Core.Collections
         {
             Array.Clear(array, 0, array.Length);
             count = 0;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return array.AsEnumerable().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace AdxToRingEdge.Core
         #region TouchPanel
 
         [Option("adxBaudRate", Required = false)]
-        public int AdxBaudRate { get; set; } = 115200;
+        public int AdxBaudRate { get; set; } = 9600;
 
         [Option("adxParity", Required = false)]
         public Parity AdxParity { get; set; } = Parity.None;
@@ -46,6 +46,9 @@ namespace AdxToRingEdge.Core
 
         [Option("maiCOM", Required = false)]
         public string MaiCOM { get; set; } = "/dev/ttyAMA0";
+
+        [Option("-noWaitMaiInit", Required = false)]
+        public bool NoWaitMaiInit { get; set; } = false;
 
         #endregion
 
