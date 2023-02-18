@@ -1,5 +1,7 @@
 ﻿using AdxToRingEdge.Core.Keyboard;
 using AdxToRingEdge.Core.TouchPanel;
+using AdxToRingEdge.Core.TouchPanel.NativeTouchPanel;
+using AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +28,13 @@ namespace AdxToRingEdge.Core
             services.Clear();
 
             if (!string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxKeyboardByIdPath))
-                services.Add(new KeyboardService());
+                services.Add(new KeyboardService(CommandArgOption.Instance));
 
             if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(CommandArgOption.Instance.MaiCOM)))
-                services.Add(new TouchPanelService());
+                services.Add(new TouchPanelService(CommandArgOption.Instance));
+
+            if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxNativeTouchPath)))
+                services.Add(new NativeTouchPanelService(CommandArgOption.Instance));
 
             LogEntity.Debug($"------Service List-------");
             foreach (var service in services)
@@ -45,7 +50,7 @@ namespace AdxToRingEdge.Core
                 }
                 catch (Exception e)
                 {
-                    LogEntity.Error($"Start service {service.GetType().Name} failed : {e.Message}");
+                    LogEntity.Error($"Try to start service {service.GetType().Name} failed : {e.Message}\n{e.StackTrace}");
                 }
             }
 
@@ -71,10 +76,20 @@ namespace AdxToRingEdge.Core
                 }
                 catch (Exception e)
                 {
-                    LogEntity.Error($"Stop service {service.GetType().Name} failed : {e.Message}");
+                    LogEntity.Error($"Stop service {service.GetType().Name} failed : {e.Message}\n{e.StackTrace}");
                 }
             }
             isRunning = false;
+        }
+
+        public void PrintStatus()
+        {
+            foreach (var service in services)
+            {
+                LogEntity.User($"------Print Serivce {service} Status------");
+                service.PrintStatus();
+            }
+            LogEntity.User($"------------------------------------------");
         }
 
         public void Dispose()

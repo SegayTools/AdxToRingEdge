@@ -10,5 +10,6 @@ namespace AdxToRingEdge.Core
     {
         void Start();
         void Stop();
+        void PrintStatus();
     }
 }

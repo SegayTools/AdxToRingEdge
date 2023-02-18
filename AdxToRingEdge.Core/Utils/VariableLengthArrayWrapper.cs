@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdxToRingEdge.Core.TouchPanel
+namespace AdxToRingEdge.Core.Utils
 {
     public class VariableLengthArrayWrapper<T> : IDisposable
     {

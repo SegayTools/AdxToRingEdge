@@ -29,6 +29,9 @@ namespace AdxToRingEdge.Core
         [Option("adxCOM", Required = false)]
         public string AdxCOM { get; set; } = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00";
 
+        [Option("adxNativeTouch", Required = false)]
+        public string AdxNativeTouchPath { get; set; } = "/dev/input/by-id/usb-Weida_Hi-Tech_CoolTouch®_System-event-if00";
+
         [Option("dunnyMaiCOM", Required = false)]
         public string DunnyMaiCOM { get; set; }
 
@@ -47,8 +50,23 @@ namespace AdxToRingEdge.Core
         [Option("maiCOM", Required = false)]
         public string MaiCOM { get; set; } = "/dev/ttyAMA0";
 
-        [Option("-noWaitMaiInit", Required = false)]
+        [Option("noWaitMaiInit", Required = false)]
         public bool NoWaitMaiInit { get; set; } = false;
+
+        [Option("noWaitDXInit", Required = false)]
+        public bool NoWaitDXInit { get; set; } = false;
+
+        [Option("disableFinaleWriteBytesLimit", Required = false)]
+        public bool DisableFinaleWriteBytesLimit { get; set; } = false;
+
+        [Option("disableDxWriteBytesLimit", Required = false)]
+        public bool DisableDxWriteBytesLimit { get; set; } = false;
+
+        [Option("nativeTouchYRange", Required = false)]
+        public string NativeTouchYRange { get; set; } = "[250,18000]";
+
+        [Option("nativeTouchXRange", Required = false)]
+        public string NativeTouchXRange { get; set; } = "[450,32250]";
 
         #endregion
 
@@ -70,11 +88,8 @@ namespace AdxToRingEdge.Core
         [Option("debug", Default = false, Required = false)]
         public bool IsDebug { get; set; }
 
-        [Option("debugSerialRead", Default = false, Required = false)]
-        public bool DebugSerialRead { get; set; }
-
-        [Option("logSerialRead", Default = false, Required = false)]
-        public bool LogSerialRead { get; set; }
+        [Option("debugSerialStatus", Default = false, Required = false)]
+        public bool DebugSerialStatus { get; set; }
 
         #endregion
 

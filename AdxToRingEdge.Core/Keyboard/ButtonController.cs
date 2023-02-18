@@ -12,10 +12,13 @@ namespace AdxToRingEdge.Core.Keyboard
 {
     public class ButtonController : IDisposable
     {
-        public Dictionary<Button, int> buttonMap = new();
-        public Dictionary<KeyCode, Button> keycodeMap = new();
+        private Dictionary<Button, int> buttonMap = new();
+        private Dictionary<KeyCode, Button> keycodeMap = new();
 
-        public Dictionary<int, bool> cachedPinState = new();
+        public IReadOnlyDictionary<Button, int> ButtonMap => buttonMap;
+        public IReadOnlyDictionary<KeyCode, Button> KeyCodeMap => keycodeMap;
+
+        private Dictionary<int, bool> cachedPinState = new();
 
         private GpioController gpioController;
 
@@ -132,6 +135,8 @@ namespace AdxToRingEdge.Core.Keyboard
             cachedPinState[pin] = isPressed;
             LogEntity.Debug($"[{button} -> pin:{pin} : {(isPressed ? "Pressed" : "Released")}]");
         }
+
+        public bool GetButtonState(Button button) => cachedPinState.TryGetValue(buttonMap[button], out var prevState) ? prevState : false;
 
         public void Dispose()
         {

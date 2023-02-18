@@ -1,15 +1,10 @@
-﻿using AdxToRingEdge.Core.Keyboard;
-using AdxToRingEdge.Core;
+﻿using AdxToRingEdge.Core;
 using CommandLine;
-using AdxToRingEdge.Core.TouchPanel;
-using AdxToRingEdge.Core.Collections;
-using AdxToRingEdge.Core.TouchPanel.Base;
-using System.IO.Ports;
 
 Console.WriteLine("PROGRAM BEGIN.");
 
 if (!CommandArgOption.Build(args))
-return;
+    return;
 
 Console.WriteLine(Environment.NewLine + "-----Dump Full Options-----");
 Console.WriteLine(Parser.Default.FormatCommandLine(CommandArgOption.Instance));
@@ -18,10 +13,22 @@ Console.WriteLine("---------------------------" + Environment.NewLine);
 var manager = new ServiceManager();
 manager.Start();
 
-while (Console.ReadLine().ToLower() != "exit")
-Thread.Sleep(0);
-
-manager.Stop();
+while (true)
+{
+    var cmd = Console.ReadLine().ToLower();
+    switch (cmd)
+    {
+        case "clear":
+            Console.Clear();
+            break;
+        case "exit":
+            manager.Stop();
+            Environment.Exit(0);
+            break;
+        default:
+            break;
+    }
+}
 
 /*
 using var serial = new SerialStreamWrapper("/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00", 9600, Parity.None, 8, StopBits.One);

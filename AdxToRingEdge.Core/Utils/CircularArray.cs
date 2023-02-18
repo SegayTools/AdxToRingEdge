@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdxToRingEdge.Core.Collections
+namespace AdxToRingEdge.Core.Utils
 {
     public class CircularArray<T> : IEnumerable<T>
     {
@@ -35,10 +35,10 @@ namespace AdxToRingEdge.Core.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int FixIndex(int ri) => count >= array.Length ? ((count + ri) % array.Length) : ri;
+        private int FixIndex(int ri) => count >= array.Length ? (count + ri) % array.Length : ri;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int FixIndex(Index i) => FixIndex(i.IsFromEnd ? (array.Length - i.Value) : i.Value);
+        private int FixIndex(Index i) => FixIndex(i.IsFromEnd ? array.Length - i.Value : i.Value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Fill(T[] buffer) => Fill(buffer.AsMemory());

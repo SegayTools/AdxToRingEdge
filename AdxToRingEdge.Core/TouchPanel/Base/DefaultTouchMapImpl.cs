@@ -21,7 +21,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
             { TouchArea.A1,new(1,0x41)}, { TouchArea.B1,new(1,0x42)}, { TouchArea.A2,new(1,0x44)}, { TouchArea.B2,new(1,0x48)},
             { TouchArea.A3,new(2,0x41)}, { TouchArea.B3,new(2,0x42)}, { TouchArea.A4,new(2,0x44)}, { TouchArea.B4,new(2,0x48)},
             { TouchArea.A5,new(3,0x41)}, { TouchArea.B5,new(3,0x42)}, { TouchArea.A6,new(3,0x44)}, { TouchArea.B6,new(3,0x48)},
-            { TouchArea.A7,new(4,0x41)}, { TouchArea.B7,new(4,0x42)}, { TouchArea.A8,new(4,0x44)}, { TouchArea.B8,new(4,0x48)}, { TouchArea.C1,new(4,0x50)},{ TouchArea.C2,new(4,0x50)}
+            { TouchArea.A7,new(4,0x41)}, { TouchArea.B7,new(4,0x42)}, { TouchArea.A8,new(4,0x44)}, { TouchArea.B8,new(4,0x48)}, { TouchArea.C1,new(4,0x50)},{ TouchArea.C2,new(4,0x50)},{ TouchArea.C,new(4,0x50)}
         };
     }
 }

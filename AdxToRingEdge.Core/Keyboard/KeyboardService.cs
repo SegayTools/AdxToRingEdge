@@ -1,10 +1,5 @@
 ﻿using AdxToRingEdge.Core.Keyboard.Base;
-using AdxToRingEdge.Core.TouchPanel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AdxToRingEdge.Core.Utils;
 
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.Keyboard.KeyboardService>;
 
@@ -15,10 +10,11 @@ namespace AdxToRingEdge.Core.Keyboard
         private readonly CommandArgOption option;
         private readonly ButtonController buttonController;
         private CancellationTokenSource cancelSource;
+        private FileStream currentInputStream;
 
-        public KeyboardService()
+        public KeyboardService(CommandArgOption option)
         {
-            option = CommandArgOption.Instance;
+            this.option = option;
             buttonController = new ButtonController(option);
         }
 
@@ -41,28 +37,45 @@ namespace AdxToRingEdge.Core.Keyboard
             var file = new FileInfo(option.AdxKeyboardByIdPath);
             using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             cancellationToken.Register(() => fs?.Dispose());
+            currentInputStream = fs;
 
             LogEntity.Debug($"fs.CanRead = {fs.CanRead}");
 
             var buffer = new byte[24];
+            var readBuffer = new VariableLengthArrayWrapper<byte>();
+            var fillIdx = 0;
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 if (!fs.CanRead)
                     break;
 
-                fs.ReadAtLeast(buffer, buffer.Length, false);
+                var read = fs.Read(readBuffer.Array, 0, readBuffer.Array.Length);
 
-                var type = BitConverter.ToUInt16(buffer, 16);
-                var code = BitConverter.ToUInt16(buffer, 18);
-                var value = BitConverter.ToInt32(buffer, 20);
+                for (int i = 0; i < read; i++)
+                {
+                    buffer[fillIdx++] = readBuffer.Array[i];
+                    fillIdx = fillIdx % buffer.Length;
 
-                //LogEntity.Debug($"OnKeyboardInputRead() read buffer : {BitConverter.ToString(buffer)}");
-
-                ProcessRawEventData(type, code, value);
+                    //mean that buffer is full.
+                    if (fillIdx == 0)
+                        ProcessRawEventData(buffer);
+                }
             }
 
+            currentInputStream = default;
             LogEntity.Debug($"OnKeyboardInputRead() exit.");
+        }
+
+        private void ProcessRawEventData(byte[] buffer)
+        {
+            var type = BitConverter.ToUInt16(buffer, 16);
+            var code = BitConverter.ToUInt16(buffer, 18);
+            var value = BitConverter.ToInt32(buffer, 20);
+
+            //LogEntity.Debug($"OnKeyboardInputRead() read buffer : {BitConverter.ToString(buffer)}");
+
+            ProcessRawEventData(type, code, value);
         }
 
         private void ProcessRawEventData(ushort type, ushort code, int value)
@@ -84,11 +97,40 @@ namespace AdxToRingEdge.Core.Keyboard
 
             cancelSource.Cancel();
             cancelSource = default;
+            currentInputStream = default;
         }
 
         public void Dispose()
         {
             Stop();
+        }
+
+        public void PrintStatus()
+        {
+            LogEntity.User($"IsRunning: {cancelSource != null}");
+            if (buttonController is not null)
+            {
+                LogEntity.User($"Print button state:");
+                foreach (var button in buttonController.ButtonMap.Keys)
+                    LogEntity.User($"\t* button:{button}\tisPressed:{buttonController.GetButtonState(button)}");
+            }
+            else
+                LogEntity.User($"NO button controller!");
+
+            if (currentInputStream is not null)
+            {
+                LogEntity.User($"currentInputStream.CanRead: {currentInputStream.CanRead}");
+                try
+                {
+                    LogEntity.User($"currentInputStream Posisiion/Length: {currentInputStream.Position}/{currentInputStream.Length} ({currentInputStream.Length - currentInputStream.Position} remain.)");
+                }
+                catch
+                {
+
+                }
+            }
+            else
+                LogEntity.User($"NO input event stream!");
         }
     }
 }
