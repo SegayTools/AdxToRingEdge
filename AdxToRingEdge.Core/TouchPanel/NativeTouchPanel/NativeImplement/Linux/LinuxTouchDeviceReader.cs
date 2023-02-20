@@ -83,7 +83,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeImplement.Linux
                 //LogEntity.Debug($"read buffer : {readBuffer.Select(x => $" {x} ")}");
             }
 
-            Log.User($"LinuxTouchDeviceReader.OnProcess() End");
+            LogEntity.User($"LinuxTouchDeviceReader.OnProcess() End");
         }
 
         private void ProcessRawEventData(byte[] buffer)

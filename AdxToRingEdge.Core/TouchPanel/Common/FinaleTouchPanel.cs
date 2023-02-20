@@ -24,8 +24,9 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         private CommandArgOption option;
         private CancellationTokenSource cancellationTokenSource;
         private Task currentTask;
-
-        public bool AutoSendCachedTouchDataBuffer { get; set; } = true;
+        private SerialStatusDebugTimer serialStatusTimer;
+        private bool isTouchDataChanged;
+        private int writeBufferLimit = -1;
 
         public FinaleTouchPanel(CommandArgOption option)
         {
@@ -44,18 +45,6 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
 
             cancellationTokenSource = new CancellationTokenSource();
             currentTask = Task.Run(() => OnFinaleProcess(cancellationTokenSource.Token), cancellationTokenSource.Token);
-
-            if (option.DebugSerialStatus)
-            {
-                Task.Run(async () =>
-                {
-                    while (!cancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        Log.User($"Current FINALE serial I/O buffer remain: [{currentFinaleSerial?.BytesToRead}bytes / {currentFinaleSerial?.BytesToWrite}bytes]");
-                        await Task.Delay(1000);
-                    }
-                });
-            }
         }
 
         public override void Stop()
@@ -65,7 +54,9 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
 
             cancellationTokenSource.Cancel();
             currentTask.Wait();
+            serialStatusTimer?.Stop();
 
+            serialStatusTimer = default;
             currentTask = default;
             cancellationTokenSource = default;
         }
@@ -168,6 +159,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         private void OnWrite(CancellationToken cancellationToken)
         {
             LogEntity.User($"Begin OnFinaleProcess.OnWrite()");
+            writeBufferLimit = option.DisableFinaleWriteBytesLimit ? int.MaxValue : finaleTouchDataBuffer.Length * option.SerialWriteBytesLimitMuliple;
+
+            LogEntity.Debug($"writeBufferLimit: {writeBufferLimit} bytes");
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 while (postDataQueue.Count > 0)
@@ -180,9 +175,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
                     }
                 }
 
-                if (AutoSendCachedTouchDataBuffer)
+                if (isFinaleInit && currentFinaleSerial != null)
                     TryFlushFinaleTouchData();
             }
+
             LogEntity.User($"End OnFinaleProcess.OnWrite()");
         }
 
@@ -194,6 +190,12 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
             {
                 currentFinaleSerial = serial;
                 isFinaleInit = option.NoWaitMaiInit;
+
+                if (option.DebugSerialStatus && serialStatusTimer is null)
+                {
+                    serialStatusTimer = new SerialStatusDebugTimer("Finale", currentFinaleSerial);
+                    serialStatusTimer.Start();
+                }
 
                 try
                 {
@@ -225,23 +227,29 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
 
         private void TryFlushFinaleTouchData()
         {
-            if (isFinaleInit && currentFinaleSerial != null)
+            //检查一下发送的数据是否和上一个相同，如果不同那就强制发送(避免惨遭某手台用户没法内屏纵联hera)
+            if (!isTouchDataChanged)
             {
-                //这里可以保证发送的数据是最新最热的，手动避免serial buffer堆积?
-                if ((!option.DisableFinaleWriteBytesLimit) && currentFinaleSerial.BytesToWrite > finaleTouchDataBuffer.Length * option.SerialWriteBytesLimitMuliple)
+                //如果相同就检查一下是否超出buffer,避免buffer堆积?
+                if (currentFinaleSerial.BytesToWrite > writeBufferLimit)
                     return;
-                //output converted touch data.
-                currentFinaleSerial.Write(finaleTouchDataBuffer, 0, finaleTouchDataBuffer.Length);
-                LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data : {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{(x == 0x40 ? "  " : (x ^ 0x40).ToString("X2"))}"))}");
             }
-        }
 
+            currentFinaleSerial.Write(finaleTouchDataBuffer, 0, finaleTouchDataBuffer.Length);
+            //LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data [{prevTouchDataHash} != {curTouchDataHash}] : {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{(x == 0x40 ? "  " : (x ^ 0x40).ToString("X2"))}"))}");
+
+            isTouchDataChanged = false;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SendTouchData(Span<byte> buffer)
         {
             for (int i = 0; i < buffer.Length; i++)
-                finaleTouchDataBuffer[i] = buffer[i];
-            TryFlushFinaleTouchData();
+            {
+                var b = buffer[i];
+                isTouchDataChanged = isTouchDataChanged || (finaleTouchDataBuffer[i] != b);
+                finaleTouchDataBuffer[i] = b;
+            }
         }
     }
 }

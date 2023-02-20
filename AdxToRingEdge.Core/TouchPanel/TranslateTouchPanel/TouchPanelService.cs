@@ -1,7 +1,7 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
 using AdxToRingEdge.Core.TouchPanel.Common;
 using AdxToRingEdge.Core.Utils;
-
+using Iot.Device.Nmea0183.Sentences;
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel.TouchPanelService>;
 
 namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
@@ -17,6 +17,7 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
         private FinaleTouchPanel finaleTouchPanel;
         private Task currentTask;
         private byte[] finaleTouchDataBuffer = new byte[14];
+        private SerialStatusDebugTimer serialStatusTimer;
 
         public TouchPanelService(CommandArgOption option)
         {
@@ -59,16 +60,10 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
 
             ResetFinaleTouchData();
 
-            if (option.DebugSerialStatus)
+            if (option.DebugSerialStatus && serialStatusTimer is null)
             {
-                Task.Run(async () =>
-                {
-                    while (!cancellationToken.IsCancellationRequested)
-                    {
-                        Log.User($"Current DX serial I/O buffer remain: [{currentAdxSerial?.BytesToRead}bytes / {currentAdxSerial?.BytesToWrite}bytes]");
-                        await Task.Delay(1000);
-                    }
-                });
+                serialStatusTimer = new SerialStatusDebugTimer("DX", currentAdxSerial);
+                serialStatusTimer.Start();
             }
 
             try
@@ -126,10 +121,12 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
 
         public override void Stop()
         {
+            serialStatusTimer?.Stop();
             cancelSource.Cancel();
             currentTask.Wait();
             finaleTouchPanel.Stop();
 
+            serialStatusTimer = default;
             cancelSource = default;
             currentTask = default;
             currentAdxSerial = default;
