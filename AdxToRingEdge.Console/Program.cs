@@ -18,6 +18,9 @@ while (true)
     var cmd = Console.ReadLine().ToLower();
     switch (cmd)
     {
+        case "status":
+            manager.PrintStatus();
+            break;
         case "clear":
             Console.Clear();
             break;

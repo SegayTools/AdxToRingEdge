@@ -33,7 +33,7 @@ namespace AdxToRingEdge.Core
             if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(CommandArgOption.Instance.MaiCOM)))
                 services.Add(new TouchPanelService(CommandArgOption.Instance));
 
-            if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxNativeTouchPath)))
+            if ((!string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxNativeTouchPath)) && !services.Any(x => x is TouchPanelService))
                 services.Add(new NativeTouchPanelService(CommandArgOption.Instance));
 
             LogEntity.Debug($"------Service List-------");
@@ -86,7 +86,7 @@ namespace AdxToRingEdge.Core
         {
             foreach (var service in services)
             {
-                LogEntity.User($"------Print Serivce {service} Status------");
+                LogEntity.User($"------Print Serivce {service.GetType().Name} Status------");
                 service.PrintStatus();
             }
             LogEntity.User($"------------------------------------------");

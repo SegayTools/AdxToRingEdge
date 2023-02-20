@@ -151,7 +151,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 
             var curArea = trackingTouchAreaMap[id] = CalculateTouchArea(prevArea, touchedX, touchedY);
 
-            LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
+            //LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
 
             if (prevArea is TouchArea pa)
                 ApplyTouchArea(pa, false);

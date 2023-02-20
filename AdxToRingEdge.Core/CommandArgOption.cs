@@ -59,6 +59,9 @@ namespace AdxToRingEdge.Core
         [Option("disableFinaleWriteBytesLimit", Required = false)]
         public bool DisableFinaleWriteBytesLimit { get; set; } = false;
 
+        [Option("serialWriteBytesLimitMuliple", Required = false)]
+        public int SerialWriteBytesLimitMuliple { get; set; } = 1;
+
         [Option("disableDxWriteBytesLimit", Required = false)]
         public bool DisableDxWriteBytesLimit { get; set; } = false;
 

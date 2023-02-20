@@ -68,6 +68,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
             serial.Write(array, offset, length);
         }
 
+        public void Flush()
+        {
+            serial.BaseStream.Flush();
+        }
+
         public void Close()
         {
             Dispose();

@@ -227,12 +227,12 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         {
             if (isFinaleInit && currentFinaleSerial != null)
             {
-                //这里可以保证发送的数据是最新最热的，手动避免serial buffer堆积
-                if ((!option.DisableFinaleWriteBytesLimit) && currentFinaleSerial.BytesToWrite > finaleTouchDataBuffer.Length * 2)
+                //这里可以保证发送的数据是最新最热的，手动避免serial buffer堆积?
+                if ((!option.DisableFinaleWriteBytesLimit) && currentFinaleSerial.BytesToWrite > finaleTouchDataBuffer.Length * option.SerialWriteBytesLimitMuliple)
                     return;
                 //output converted touch data.
                 currentFinaleSerial.Write(finaleTouchDataBuffer, 0, finaleTouchDataBuffer.Length);
-                //LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data : {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{x:X2}"))}");
+                LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data : {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{(x == 0x40 ? "  " : (x ^ 0x40).ToString("X2"))}"))}");
             }
         }
 
