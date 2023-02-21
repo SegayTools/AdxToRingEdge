@@ -96,5 +96,14 @@ namespace AdxToRingEdge.Core
         {
             Stop();
         }
+
+        public void TryProcessUserInput(string[] cmds)
+        {
+            foreach (var service in services)
+            {
+                if (service.TryProcessUserInput(cmds))
+                    break;
+            }
+        }
     }
 }

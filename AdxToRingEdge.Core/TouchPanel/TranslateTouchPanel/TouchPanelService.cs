@@ -142,5 +142,10 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
         {
             Stop();
         }
+
+        public bool TryProcessUserInput(string[] args)
+        {
+            return false;
+        }
     }
 }

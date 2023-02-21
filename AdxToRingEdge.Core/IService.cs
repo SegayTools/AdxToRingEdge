@@ -8,7 +8,7 @@ namespace AdxToRingEdge.Core
 {
     public interface IService : IDisposable
     {
-
+        bool TryProcessUserInput(string[] args);
 
         void Start();
         void Stop();

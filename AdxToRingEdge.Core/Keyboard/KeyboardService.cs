@@ -132,5 +132,10 @@ namespace AdxToRingEdge.Core.Keyboard
             else
                 LogEntity.User($"NO input event stream!");
         }
+
+        public bool TryProcessUserInput(string[] args)
+        {
+            return false;
+        }
     }
 }

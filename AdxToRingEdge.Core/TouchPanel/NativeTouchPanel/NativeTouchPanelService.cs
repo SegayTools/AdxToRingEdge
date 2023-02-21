@@ -203,5 +203,10 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
         {
             deviceReader?.PrintStatus();
         }
+
+        public bool TryProcessUserInput(string[] args)
+        {
+            return false;
+        }
     }
 }

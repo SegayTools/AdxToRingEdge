@@ -15,8 +15,8 @@ manager.Start();
 
 while (true)
 {
-    var cmd = Console.ReadLine().ToLower();
-    switch (cmd)
+    var cmd = Console.ReadLine();
+    switch (cmd.ToLower())
     {
         case "status":
             manager.PrintStatus();
@@ -29,6 +29,8 @@ while (true)
             Environment.Exit(0);
             break;
         default:
+            var cmds = cmd.Split(' ');
+            manager.TryProcessUserInput(cmds);
             break;
     }
 }
