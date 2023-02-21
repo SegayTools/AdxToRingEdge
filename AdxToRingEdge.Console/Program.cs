@@ -3,11 +3,11 @@ using CommandLine;
 
 Console.WriteLine("PROGRAM BEGIN.");
 
-if (!CommandArgOption.Build(args))
+if (!ProgramArgumentOption.Build(args))
     return;
 
 Console.WriteLine(Environment.NewLine + "-----Dump Full Options-----");
-Console.WriteLine(Parser.Default.FormatCommandLine(CommandArgOption.Instance));
+Console.WriteLine(Parser.Default.FormatCommandLine(ProgramArgumentOption.Instance));
 Console.WriteLine("---------------------------" + Environment.NewLine);
 
 var manager = new ServiceManager();

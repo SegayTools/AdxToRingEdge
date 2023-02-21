@@ -10,7 +10,7 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
     {
         private TouchAreaMap convertMap = new TouchAreaMap(DefaultTouchMapImpl.DxTouchMap, DefaultTouchMapImpl.FinaleTouchMap);
 
-        private readonly CommandArgOption option;
+        private readonly ProgramArgumentOption option;
 
         private CancellationTokenSource cancelSource;
         private SerialStreamWrapper currentAdxSerial = null;
@@ -19,7 +19,7 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
         private byte[] finaleTouchDataBuffer = new byte[14];
         private SerialStatusDebugTimer serialStatusTimer;
 
-        public TouchPanelService(CommandArgOption option)
+        public TouchPanelService(ProgramArgumentOption option)
         {
             this.option = option;
         }
@@ -101,6 +101,7 @@ namespace AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel
             catch (Exception e)
             {
                 LogEntity.Error($"End OnDXProcess() by exception : {e.Message}\n{e.StackTrace}");
+                Stop();
             }
         }
 

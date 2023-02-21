@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core
 {
-    public class CommandArgOption
+    public class ProgramArgumentOption
     {
         #region TouchPanel
 
@@ -66,7 +66,7 @@ namespace AdxToRingEdge.Core
         public bool DisableDxWriteBytesLimit { get; set; } = false;
 
         [Option("nativeTouchYRange", Required = false)]
-        public string NativeTouchYRange { get; set; } = "[250,18000]";
+        public string NativeTouchYRange { get; set; } = "[18000,250]";
 
         [Option("nativeTouchXRange", Required = false)]
         public string NativeTouchXRange { get; set; } = "[450,32250]";
@@ -96,11 +96,11 @@ namespace AdxToRingEdge.Core
 
         #endregion
 
-        public static CommandArgOption Instance { get; internal set; }
+        public static ProgramArgumentOption Instance { get; internal set; }
 
         public static bool Build(string[] args)
         {
-            var p = Parser.Default.ParseArguments<CommandArgOption>(args);
+            var p = Parser.Default.ParseArguments<ProgramArgumentOption>(args);
 
             if (p.Errors.Any())
             {

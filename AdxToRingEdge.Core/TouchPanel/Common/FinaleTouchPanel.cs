@@ -21,14 +21,14 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         private SerialStreamWrapper currentFinaleSerial = null;
         private Queue<PostData> postDataQueue = new();
         private bool isFinaleInit = false;
-        private CommandArgOption option;
+        private ProgramArgumentOption option;
         private CancellationTokenSource cancellationTokenSource;
         private Task currentTask;
         private SerialStatusDebugTimer serialStatusTimer;
         private bool isTouchDataChanged;
         private int writeBufferLimit = -1;
 
-        public FinaleTouchPanel(CommandArgOption option)
+        public FinaleTouchPanel(ProgramArgumentOption option)
         {
             this.option = option;
         }

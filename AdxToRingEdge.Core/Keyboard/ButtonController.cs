@@ -22,7 +22,7 @@ namespace AdxToRingEdge.Core.Keyboard
 
         private GpioController gpioController;
 
-        public ButtonController(CommandArgOption option)
+        public ButtonController(ProgramArgumentOption option)
         {
             gpioController = new GpioController();
 
@@ -51,7 +51,7 @@ namespace AdxToRingEdge.Core.Keyboard
             cachedPinState.Clear();
         }
 
-        private void BuildKeycodeMap(CommandArgOption option)
+        private void BuildKeycodeMap(ProgramArgumentOption option)
         {
             var map = new Dictionary<KeyCode, Button>()
             {
@@ -81,7 +81,7 @@ namespace AdxToRingEdge.Core.Keyboard
 
             keycodeMap = map;
         }
-        private void BuildButtonMap(CommandArgOption option)
+        private void BuildButtonMap(ProgramArgumentOption option)
         {
             var map = new Dictionary<Button, int>()
             {

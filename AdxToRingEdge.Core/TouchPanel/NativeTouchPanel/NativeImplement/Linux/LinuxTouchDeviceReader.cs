@@ -36,7 +36,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeImplement.Linux
         public override event OnTouchCallbackFunc OnTouchMove;
         public override event OnTouchCallbackFunc OnTouchEnd;
 
-        public LinuxTouchDeviceReader(CommandArgOption opt) : base(opt)
+        public LinuxTouchDeviceReader(ProgramArgumentOption opt) : base(opt)
         { }
 
         public override void Start()

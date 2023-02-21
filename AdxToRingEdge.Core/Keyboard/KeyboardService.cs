@@ -7,12 +7,12 @@ namespace AdxToRingEdge.Core.Keyboard
 {
     public class KeyboardService : IService
     {
-        private readonly CommandArgOption option;
+        private readonly ProgramArgumentOption option;
         private readonly ButtonController buttonController;
         private CancellationTokenSource cancelSource;
         private FileStream currentInputStream;
 
-        public KeyboardService(CommandArgOption option)
+        public KeyboardService(ProgramArgumentOption option)
         {
             this.option = option;
             buttonController = new ButtonController(option);

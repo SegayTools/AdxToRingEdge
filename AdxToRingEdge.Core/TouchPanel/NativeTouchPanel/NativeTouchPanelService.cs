@@ -2,6 +2,7 @@
 using AdxToRingEdge.Core.TouchPanel.Common;
 using AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base;
 using AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeImplement.Linux;
+using AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeImplement.Windows;
 using SixLabors.ImageSharp.Formats;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 {
     internal class NativeTouchPanelService : IService
     {
-        private readonly CommandArgOption option;
+        private readonly ProgramArgumentOption option;
         private NativeTouchDeviceReader deviceReader;
         private FinaleTouchAreaPathMap pathMap = new();
         private Dictionary<int, TouchArea?> trackingTouchAreaMap;
@@ -28,9 +29,9 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 
         private Vector2 nativeXRange;
         private Vector2 nativeYRange;
-        private Regex rangeRegex = new (@"\[([-\d.]+),([-\d.]+)\]");
+        private Regex rangeRegex = new(@"\[\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\]");
 
-        public NativeTouchPanelService(CommandArgOption option)
+        public NativeTouchPanelService(ProgramArgumentOption option)
         {
             this.option = option;
         }
@@ -41,6 +42,8 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
             {
                 case PlatformID.Unix:
                     return new LinuxTouchDeviceReader(option);
+                case PlatformID.Win32NT:
+                    return new WindowsTouchDeviceReader(option);
                 default:
                     throw new NotSupportedException("CreateDeviceReader() currently support Linux.");
             }
@@ -68,8 +71,8 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
             nativeXRange = ParseRangeString(option.NativeTouchXRange);
             nativeYRange = ParseRangeString(option.NativeTouchYRange);
 
-            LogEntity.Debug($"nativeXRange: {nativeXRange}");
-            LogEntity.Debug($"nativeYRange: {nativeYRange}");
+            LogEntity.Debug($"nativeRange: x{nativeXRange} y{nativeYRange}");
+            LogEntity.Debug($"pathMap offset:({pathMap.BaseX:F4},{pathMap.BaseY:F4}) size:({pathMap.Width:F4},{pathMap.Height:F4})");
 
             trackingTouchAreaMap = new();
 
@@ -144,14 +147,14 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
             var prevArea = trackingTouchAreaMap.TryGetValue(id, out var a) ? a : default;
 
             var normalizedX = (touchArg.Y - nativeXRange.X) * 1.0f / (nativeXRange.Y - nativeXRange.X); //从左到右0~32000
-            var normalizedY = 1 - (touchArg.X - nativeYRange.X) * 1.0f / (nativeYRange.Y - nativeYRange.X); //从下到上0~18000
+            var normalizedY = (touchArg.X - nativeYRange.X) * 1.0f / (nativeYRange.Y - nativeYRange.X); //从下到上0~18000
 
             var touchedX = normalizedX * pathMap.Width + pathMap.BaseX;
             var touchedY = normalizedY * pathMap.Height + pathMap.BaseY;
 
             var curArea = trackingTouchAreaMap[id] = CalculateTouchArea(prevArea, touchedX, touchedY);
 
-            //LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
+            LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
 
             if (prevArea is TouchArea pa)
                 ApplyTouchArea(pa, false);

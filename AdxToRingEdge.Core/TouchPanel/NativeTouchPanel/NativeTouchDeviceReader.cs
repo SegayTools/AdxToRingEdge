@@ -10,7 +10,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 {
     public abstract class NativeTouchDeviceReader
     {
-        protected CommandArgOption option;
+        protected ProgramArgumentOption option;
 
         public delegate void OnTouchCallbackFunc(int id, TouchEventArg arg);
 
@@ -20,7 +20,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 
         public abstract bool IsRunning { get; }
 
-        public NativeTouchDeviceReader(CommandArgOption opt)
+        public NativeTouchDeviceReader(ProgramArgumentOption opt)
         {
             option = opt;
         }

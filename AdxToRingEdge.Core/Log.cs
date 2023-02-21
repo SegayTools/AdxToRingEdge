@@ -51,7 +51,7 @@ namespace AdxToRingEdge.Core
 
         public void Debug(string tag, string message)
         {
-            if (CommandArgOption.Instance.IsDebug)
+            if (ProgramArgumentOption.Instance.IsDebug)
                 Output(LogType.Debug, tag, message);
         }
 

@@ -8,6 +8,8 @@ namespace AdxToRingEdge.Core
 {
     public interface IService : IDisposable
     {
+
+
         void Start();
         void Stop();
         void PrintStatus();

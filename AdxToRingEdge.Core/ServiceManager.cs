@@ -27,14 +27,14 @@ namespace AdxToRingEdge.Core
 
             services.Clear();
 
-            if (!string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxKeyboardByIdPath))
-                services.Add(new KeyboardService(CommandArgOption.Instance));
+            if (!string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxKeyboardByIdPath))
+                services.Add(new KeyboardService(ProgramArgumentOption.Instance));
 
-            if (!(string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(CommandArgOption.Instance.MaiCOM)))
-                services.Add(new TouchPanelService(CommandArgOption.Instance));
+            if (!(string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.MaiCOM)))
+                services.Add(new TouchPanelService(ProgramArgumentOption.Instance));
 
-            if ((!string.IsNullOrWhiteSpace(CommandArgOption.Instance.AdxNativeTouchPath)) && !services.Any(x => x is TouchPanelService))
-                services.Add(new NativeTouchPanelService(CommandArgOption.Instance));
+            if ((!string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxNativeTouchPath)) && !services.Any(x => x is TouchPanelService))
+                services.Add(new NativeTouchPanelService(ProgramArgumentOption.Instance));
 
             LogEntity.Debug($"------Service List-------");
             foreach (var service in services)
@@ -66,7 +66,6 @@ namespace AdxToRingEdge.Core
                 return;
             }
 
-            LogEntity.User("SERVICE END.");
             foreach (var service in services)
             {
                 try
@@ -79,6 +78,7 @@ namespace AdxToRingEdge.Core
                     LogEntity.Error($"Stop service {service.GetType().Name} failed : {e.Message}\n{e.StackTrace}");
                 }
             }
+            LogEntity.User("ALL SERVICE STOPPED.");
             isRunning = false;
         }
 
