@@ -1,10 +1,14 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnitsNet;
 using static AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base.FinaleTouchAreaPathMap;
+
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base.FinaleTouchAreaPathMap>;
 
 namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base
 {
@@ -115,10 +119,10 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base
         private Dictionary<TouchArea, TouchAreaPath> pathMap = new();
         public IEnumerable<TouchArea> TouchAreas => pathMap.Keys;
 
-        public float Width { get; }
-        public float BaseX { get; }
-        public float Height { get; }
-        public float BaseY { get; }
+        public float Width { get; set; }
+        public float BaseX { get; set; }
+        public float Height { get; set; }
+        public float BaseY { get; set; }
 
         public FinaleTouchAreaPathMap()
         {
@@ -160,6 +164,84 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base
                 return false;
 
             return path.IsInArea(p);
+        }
+        /*
+        #region Drawing
+
+        Dictionary<TouchArea, List<Vector2>> drawingAreaContainer = new();
+        TouchArea currentDrawingArea = default;
+        TouchEventArg currentDrawingTouch = default;
+
+        public void AddTouch(TouchArea area, TouchEventArg t)
+        {
+            if (!drawingAreaContainer.TryGetValue(currentDrawingArea, out var list))
+                list = drawingAreaContainer[currentDrawingArea] = new();
+
+            list.Add(new Vector2(t.X, t.Y));
+            LogEntity.User($"Add {area} last point: {t}");
+        }
+
+        public void RegisterCurrentTouch(TouchEventArg t)
+        {
+            currentDrawingTouch = t;
+            //LogEntity.User($"Set currentDrawingTouch: {currentDrawingTouch}");
+        }
+
+        public void DelPrevTouch(TouchArea area)
+        {
+            if (drawingAreaContainer.TryGetValue(area, out var list) && list.Count > 0)
+            {
+                var p = list.LastOrDefault();
+                list.Remove(p);
+                LogEntity.User($"Deleted touch {area} last point: {p}");
+            }
+        }
+
+        public void SaveFile()
+        {
+            var path = Path.GetFullPath("./saveDrawing.txt");
+            using var fs = File.OpenWrite(path);
+            using var writer = new StreamWriter(fs);
+
+            foreach (var pair in drawingAreaContainer)
+                writer.WriteLine($"a[TouchArea.{pair.Key}] = new TouchAreaPath(new Vector2[] {{{string.Join(",", pair.Value.Select(x => $"new ({x.X},{x.Y})"))}}})");
+            LogEntity.User($"Saved to {path}");
+        }
+
+        #endregion
+        */
+
+        internal bool TryProcessUserInput(string[] args)
+        {
+            switch (args[0].ToLower().Trim())
+            {
+                /*
+                case "set-area":
+                    var r = args[1].Trim();
+                    if (Enum.TryParse<TouchArea>(args[1].Trim(), true, out var c))
+                    {
+                        currentDrawingArea = c;
+                        LogEntity.User($"set currentDrawingArea: {currentDrawingArea}");
+                    }
+                    else
+                        LogEntity.User($"set currentDrawingArea failed, unknown content: {r}");
+                    break;
+                case "add-touch":
+                    AddTouch(currentDrawingArea, currentDrawingTouch);
+                    break;
+                case "del-touch":
+                    DelPrevTouch(currentDrawingArea);
+                    break;
+                case "save-file":
+                    SaveFile();
+                    break;
+
+                */
+                default:
+                    return false;
+            }
+
+            return true;
         }
     }
 }

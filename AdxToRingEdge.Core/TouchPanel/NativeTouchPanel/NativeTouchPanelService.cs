@@ -43,7 +43,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
                 case PlatformID.Unix:
                     return new LinuxTouchDeviceReader(option);
                 case PlatformID.Win32NT:
-                    return new WindowsTouchDeviceReader(option);
+                    //return new WindowsTouchDeviceReader(option); WIP
                 default:
                     throw new NotSupportedException("CreateDeviceReader() currently support Linux.");
             }
@@ -163,6 +163,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
                 ApplyTouchArea(ca, true);
 
             finaleTouchPanel.SendTouchData(finaleTouchDataBuffer);
+            //pathMap.RegisterCurrentTouch(touchArg);
         }
 
         private TouchArea? CalculateTouchArea(TouchArea? prev, float currentX, float currentY)
@@ -206,7 +207,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 
         public bool TryProcessUserInput(string[] args)
         {
-            return false;
+            return pathMap.TryProcessUserInput(args);
         }
     }
 }
