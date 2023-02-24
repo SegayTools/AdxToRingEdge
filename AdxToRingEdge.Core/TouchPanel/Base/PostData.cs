@@ -25,10 +25,10 @@ namespace AdxToRingEdge.Core.TouchPanel
             Data = default;
         }
 
-        public static PostData CreateWithCopy(byte[] copyDataSource)
+        public static PostData CreateWithCopy(Memory<byte> copyDataSource)
         {
             var copy = new PostData(copyDataSource.Length);
-            Array.Copy(copyDataSource, copy.buffer, copyDataSource.Length);
+            copyDataSource.CopyTo(copy.Data);
             return copy;
         }
     }

@@ -139,7 +139,9 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeImplement.Linux
                                 break;
                             case LinuxTouchEventCode.ABS_MT_TRACKING_ID:
                                 slotContainer.CurrentSlotEvent.TrackId = value;
-                                raiseEvent = value != -1 ? OnTouchBegin : OnTouchEnd;
+                                //raiseEvent = value != -1 ? OnTouchBegin : OnTouchEnd;
+                                if (value == -1)
+                                    raiseEvent = OnTouchEnd;
                                 break;
                             default:
                                 break;

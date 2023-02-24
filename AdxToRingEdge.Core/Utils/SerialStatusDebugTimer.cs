@@ -46,7 +46,7 @@ namespace AdxToRingEdge.Core.Utils
                 var speedRead = (int)(Math.Abs(curTotalRead - prevTotalRead) / interval);
                 var speedWrite = (int)(Math.Abs(curTotalWrite - prevTotalWrite) / interval);
 
-                LogEntity.User($"Current {serialDisplayName} serial I/O buffer remain: [{serial?.BytesToRead}bytes / {serial?.BytesToWrite}bytes], speed: [{speedRead} b/s  /  {speedWrite} b/s]");
+                LogEntity.User($"Current {serialDisplayName} serial I/O buffer remain: [{serial?.BytesToRead} bytes / {serial?.BytesToWrite} bytes], speed: [{speedRead} b/s  /  {speedWrite} b/s]");
 
                 prevTotalRead = curTotalRead;
                 prevTotalWrite = curTotalWrite;

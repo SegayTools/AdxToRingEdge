@@ -56,6 +56,9 @@ namespace AdxToRingEdge.Core
         [Option("noWaitDXInit", Required = false)]
         public bool NoWaitDXInit { get; set; } = false;
 
+        [Option("maiIdleRefreshInterval", Required = false)]
+        public float MaiIdleRefreshInterval { get; set; } = 1;
+
         [Option("disableFinaleWriteBytesLimit", Required = false)]
         public bool DisableFinaleWriteBytesLimit { get; set; } = false;
 

@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using UnitsNet;
 using static AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.Base.FinaleTouchAreaPathMap;
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.NativeTouchPanel.NativeTouchPanelService>;
 
@@ -23,6 +24,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
         private NativeTouchDeviceReader deviceReader;
         private FinaleTouchAreaPathMap pathMap = new();
         private Dictionary<int, TouchArea?> trackingTouchAreaMap;
+        private Dictionary<TouchArea, int> touchAreaCountMap;
         private FinaleTouchPanel finaleTouchPanel;
 
         private byte[] finaleTouchDataBuffer = new byte[14];
@@ -43,7 +45,7 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
                 case PlatformID.Unix:
                     return new LinuxTouchDeviceReader(option);
                 case PlatformID.Win32NT:
-                    //return new WindowsTouchDeviceReader(option); WIP
+                //return new WindowsTouchDeviceReader(option); WIP
                 default:
                     throw new NotSupportedException("CreateDeviceReader() currently support Linux.");
             }
@@ -75,6 +77,9 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
             LogEntity.Debug($"pathMap offset:({pathMap.BaseX:F4},{pathMap.BaseY:F4}) size:({pathMap.Width:F4},{pathMap.Height:F4})");
 
             trackingTouchAreaMap = new();
+            touchAreaCountMap = new();
+            foreach (var area in Enum.GetValues<TouchArea>())
+                touchAreaCountMap[area] = 0;
 
             finaleTouchPanel = new(option);
             //finaleTouchPanel.AutoSendCachedTouchDataBuffer = true;
@@ -115,21 +120,28 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
             trackingTouchAreaMap.Remove(touchArg.Id);
 
             if (area is TouchArea a)
-                ApplyTouchArea(a, false);
+                touchAreaCountMap[a] = touchAreaCountMap[a] - 1;
 
+            UpdateTouchData();
             finaleTouchPanel.SendTouchData(finaleTouchDataBuffer);
         }
 
-        private void ApplyTouchArea(TouchArea area, bool isTouched)
+        private void UpdateTouchData()
         {
-            if (DefaultTouchMapImpl.FinaleTouchMap.TryGetValue(area, out var loc))
+            foreach (var pair in touchAreaCountMap)
             {
-                var idx = loc.PacketIdx;
+                var area = pair.Key;
+                var isTouched = pair.Value > 0;
 
-                if (isTouched)
-                    finaleTouchDataBuffer[idx] = (byte)(finaleTouchDataBuffer[idx] | loc.Bit);
-                else
-                    finaleTouchDataBuffer[idx] = (byte)(finaleTouchDataBuffer[idx] & (byte)(~(loc.Bit ^ 0x40)));
+                if (DefaultTouchMapImpl.FinaleTouchMap.TryGetValue(area, out var loc))
+                {
+                    var idx = loc.PacketIdx;
+
+                    if (isTouched)
+                        finaleTouchDataBuffer[idx] = (byte)(finaleTouchDataBuffer[idx] | loc.Bit);
+                    else
+                        finaleTouchDataBuffer[idx] = (byte)(finaleTouchDataBuffer[idx] & (byte)(~(loc.Bit ^ 0x40)));
+                }
             }
         }
 
@@ -154,14 +166,15 @@ namespace AdxToRingEdge.Core.TouchPanel.NativeTouchPanel
 
             var curArea = trackingTouchAreaMap[id] = CalculateTouchArea(prevArea, touchedX, touchedY);
 
-            LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
+            //LogEntity.Debug($"\t* {id}\tN-Pos[{normalizedX:F4},{normalizedY:F4}]\tT-Pos[{touchedX:F4},{touchedY:F4}]\tTouched:{curArea}");
 
             if (prevArea is TouchArea pa)
-                ApplyTouchArea(pa, false);
+                touchAreaCountMap[pa] = touchAreaCountMap[pa] - 1;
 
             if (curArea is TouchArea ca)
-                ApplyTouchArea(ca, true);
+                touchAreaCountMap[ca] = touchAreaCountMap[ca] + 1;
 
+            UpdateTouchData();
             finaleTouchPanel.SendTouchData(finaleTouchDataBuffer);
             //pathMap.RegisterCurrentTouch(touchArg);
         }

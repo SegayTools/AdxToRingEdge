@@ -1,5 +1,6 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
 using AdxToRingEdge.Core.Utils;
+using Iot.Device.Nmea0183.Sentences;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualBasic.FileIO;
 using System;
@@ -26,7 +27,9 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         private Task currentTask;
         private SerialStatusDebugTimer serialStatusTimer;
         private bool isTouchDataChanged;
+        private DateTime prevAutoUpdateTime;
         private int writeBufferLimit = -1;
+        private float idleInterval;
 
         public FinaleTouchPanel(ProgramArgumentOption option)
         {
@@ -127,6 +130,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
                                     LogEntity.User($"OnFinaleProcess() start to send touch data");
                                     ResetFinaleTouchData();
                                     isFinaleInit = true;
+                                    prevAutoUpdateTime = DateTime.Now;
                                     break;
 
                                 case (byte)TouchSensorStat.HALT:
@@ -160,8 +164,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
         {
             LogEntity.User($"Begin OnFinaleProcess.OnWrite()");
             writeBufferLimit = option.DisableFinaleWriteBytesLimit ? int.MaxValue : finaleTouchDataBuffer.Length * option.SerialWriteBytesLimitMuliple;
-
-            LogEntity.Debug($"writeBufferLimit: {writeBufferLimit} bytes");
+            idleInterval = option.MaiIdleRefreshInterval;
+            LogEntity.Debug($"writeBufferLimit: {writeBufferLimit} bytes, idleInterval: {idleInterval} s");
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -176,7 +180,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
                 }
 
                 if (isFinaleInit && currentFinaleSerial != null)
+                {
+
                     TryFlushFinaleTouchData();
+
+                }
             }
 
             LogEntity.User($"End OnFinaleProcess.OnWrite()");
@@ -227,20 +235,27 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
 
         private void TryFlushFinaleTouchData()
         {
+            var curTime = DateTime.Now;
+
             //检查一下发送的数据是否和上一个相同，如果不同那就强制发送(避免惨遭某手台用户没法内屏纵联hera)
             if (!isTouchDataChanged)
             {
+                //固定一定时间刷新发送缓存好的数据，避免finale一直等不到数据就炸了
+                if ((curTime - prevAutoUpdateTime).TotalSeconds < idleInterval)
+                    return;
+                prevAutoUpdateTime = curTime;
                 //如果相同就检查一下是否超出buffer,避免buffer堆积?
                 if (currentFinaleSerial.BytesToWrite > writeBufferLimit)
                     return;
             }
 
+            prevAutoUpdateTime = DateTime.Now;
             currentFinaleSerial.Write(finaleTouchDataBuffer, 0, finaleTouchDataBuffer.Length);
-            //LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data [{prevTouchDataHash} != {curTouchDataHash}] : {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{(x == 0x40 ? "  " : (x ^ 0x40).ToString("X2"))}"))}");
+            LogEntity.Debug($"OnFinaleProcess.OnWrite() post touch data: {string.Join(" ", finaleTouchDataBuffer.Select(x => $"{(x == 0x40 ? "  " : (x ^ 0x40).ToString("X2"))}"))}");
 
             isTouchDataChanged = false;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SendTouchData(Span<byte> buffer)
         {
@@ -250,6 +265,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common
                 isTouchDataChanged = isTouchDataChanged || (finaleTouchDataBuffer[i] != b);
                 finaleTouchDataBuffer[i] = b;
             }
+
+            //TryFlushFinaleTouchData();
         }
     }
 }
