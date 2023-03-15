@@ -15,7 +15,7 @@ namespace AdxToRingEdge.Core.Utils
 
         public void CheckSize(int size)
         {
-            if (size > array.Length)
+            while (size > array.Length)
             {
                 var newLength = array.Length * 2;
                 ArrayPool<T>.Shared.Return(array);

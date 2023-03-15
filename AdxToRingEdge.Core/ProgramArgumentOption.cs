@@ -10,69 +10,66 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core
 {
-    public class ProgramArgumentOption
+    public partial class ProgramArgumentOption
     {
         #region TouchPanel
 
-        [Option("adxBaudRate", Required = false)]
-        public int AdxBaudRate { get; set; } = 9600;
+        [Option("inNativeTouchYRange", Required = false)]
+        public string InNativeTouchYRange { get; set; } = "[18000,250]";
 
-        [Option("adxParity", Required = false)]
-        public Parity AdxParity { get; set; } = Parity.None;
+        [Option("inNativeTouchXRange", Required = false)]
+        public string InNativeTouchXRange { get; set; } = "[450,32250]";
 
-        [Option("adxDataBits", Required = false)]
-        public int AdxDataBits { get; set; } = 8;
+        [Option("inMemoryMappingFileName", Required = false)]
+        public string InMemoryMappingFileName { get; set; } = "Sinmai_TouchPanel_1P";
 
-        [Option("adxStopBits", Required = false)]
-        public StopBits AdxStopBits { get; set; } = StopBits.One;
+        //----------------------------------------------
 
-        [Option("adxCOM", Required = false)]
-        public string AdxCOM { get; set; } = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00";
+        [Option("inType", Required = false)]
+        public InType InType { get; set; } = InType.None;
 
-        [Option("adxNativeTouch", Required = false)]
-        public string AdxNativeTouchPath { get; set; } = "/dev/input/by-id/usb-Weida_Hi-Tech_CoolTouch®_System-event-if00";
+        [Option("inTouchPanelBaudRate", Required = false)]
+        public int InTouchPanelBaudRate { get; set; } = 9600;
 
-        [Option("dunnyMaiCOM", Required = false)]
-        public string DunnyMaiCOM { get; set; }
+        [Option("inTouchPanelParity", Required = false)]
+        public Parity InTouchPanelParity { get; set; } = Parity.None;
 
-        [Option("maiBaudRate", Required = false)]
-        public int MaiBaudRate { get; set; } = 9600;
+        [Option("inTouchPanelDataBits", Required = false)]
+        public int InTouchPanelDataBits { get; set; } = 8;
 
-        [Option("maiParity", Required = false)]
-        public Parity MaiParity { get; set; } = Parity.None;
+        [Option("inTouchPanelStopBits", Required = false)]
+        public StopBits InTouchPanelStopBits { get; set; } = StopBits.One;
 
-        [Option("maiDataBits", Required = false)]
-        public int MaiDataBits { get; set; } = 8;
+        [Option("inTouchPanelCOM", Required = false)]
+        public string InTouchPanelCOM { get; set; } = "/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00";
 
-        [Option("maiStopBits", Required = false)]
-        public StopBits MaiStopBits { get; set; } = StopBits.One;
+        [Option("inNativeTouchPath", Required = false)]
+        public string InNativeTouchPath { get; set; } = "/dev/input/by-id/usb-Weida_Hi-Tech_CoolTouch®_System-event-if00";
 
-        [Option("maiCOM", Required = false)]
-        public string MaiCOM { get; set; } = "/dev/ttyAMA0";
+        //-----------------
 
-        [Option("noWaitMaiInit", Required = false)]
-        public bool NoWaitMaiInit { get; set; } = false;
+        [Option("outType", Required = false)]
+        public OutType OutType { get; set; } = OutType.None;
 
-        [Option("noWaitDXInit", Required = false)]
-        public bool NoWaitDXInit { get; set; } = false;
+        [Option("outTouchPanelBaudRate", Required = false)]
+        public int OutTouchPanelBaudRate { get; set; } = 9600;
 
-        [Option("maiIdleRefreshInterval", Required = false)]
-        public float MaiIdleRefreshInterval { get; set; } = 1;
+        [Option("outTouchPanelParity", Required = false)]
+        public Parity OutTouchPanelParity { get; set; } = Parity.None;
 
-        [Option("disableFinaleWriteBytesLimit", Required = false)]
-        public bool DisableFinaleWriteBytesLimit { get; set; } = false;
+        [Option("outTouchPanelDataBits", Required = false)]
+        public int OutTouchPanelDataBits { get; set; } = 8;
 
-        [Option("serialWriteBytesLimitMuliple", Required = false)]
-        public int SerialWriteBytesLimitMuliple { get; set; } = 0;
+        [Option("outTouchPanelStopBits", Required = false)]
+        public StopBits OutTouchPanelStopBits { get; set; } = StopBits.One;
 
-        [Option("disableDxWriteBytesLimit", Required = false)]
-        public bool DisableDxWriteBytesLimit { get; set; } = false;
+        [Option("outTouchPanelCOM", Required = false)]
+        public string OutTouchPanelCOM { get; set; } = "";
 
-        [Option("nativeTouchYRange", Required = false)]
-        public string NativeTouchYRange { get; set; } = "[18000,250]";
+        [Option("outMemoryMappingFileName", Required = false)]
+        public string OutMemoryMappingFileName { get; set; } = "Sinmai_TouchPanel_1P";
 
-        [Option("nativeTouchXRange", Required = false)]
-        public string NativeTouchXRange { get; set; } = "[450,32250]";
+        //----------------------------------------------
 
         #endregion
 

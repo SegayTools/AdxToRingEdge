@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+﻿using AdxToRingEdge.Core.Utils;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +22,12 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         public int BytesToWrite => serial.BytesToWrite;
         private int prevBytesToWrite;
         private int curBytesToWrite;
+        private int minBufferLimit;
+        private AbortableThread task;
         private readonly string portName;
+
+        public delegate void OnEmptyWritableBufferReadyFunc();
+        public event OnEmptyWritableBufferReadyFunc OnEmptyWritableBufferReady;
 
         public long TotalWriteBytes { get; private set; }
         public long TotalReadBytes { get; private set; }
@@ -32,6 +38,30 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         {
             serial = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this.portName = portName;
+        }
+
+        public void StartNonBufferEventDrive(int minBufferLimit = 1)
+        {
+            if (task != null)
+                return;
+            this.minBufferLimit = Math.Max(0, minBufferLimit);
+            task = new AbortableThread(OnEventDriving);
+            task.Start();
+        }
+
+        private void OnEventDriving(CancellationToken obj)
+        {
+            while (!obj.IsCancellationRequested)
+            {
+                if (BytesToWrite <= minBufferLimit)
+                    OnEmptyWritableBufferReady?.Invoke();
+            }
+        }
+
+        public void StopNonBufferEventDrive()
+        {
+            task?.Abort();
+            task = null;
         }
 
         public void Dispose()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Iot.Device.Card.CreditCardProcessing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -62,6 +63,31 @@ namespace AdxToRingEdge.Core
 
     public static class Log
     {
+        public interface ITaggedLog
+        {
+            void Debug(string message);
+            void User(string message);
+            void Warn(string message);
+            void Error(string message);
+        }
+
+        private class TaggedLog : ITaggedLog
+        {
+            private readonly string tag;
+
+            public TaggedLog(string tag)
+            {
+                this.tag = tag;
+            }
+
+            public void Debug(string message) => Log.Debug(tag, message);
+            public void User(string message) => Log.User(tag, message);
+            public void Warn(string message) => Log.Warn(tag, message);
+            public void Error(string message) => Log.Error(tag, message);
+        }
+
+        public static ITaggedLog CreateTaggedLog(string tag) => new TaggedLog(tag);
+
         public static ILog Impl { internal get; set; } = new DefaultConsoleLog();
 
         [Conditional("DEBUG")]

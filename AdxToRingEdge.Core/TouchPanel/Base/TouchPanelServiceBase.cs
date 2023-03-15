@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
     {
         public abstract void Start();
         public abstract void Stop();
+
+        public abstract void SendTouchData(Span<byte> buffer);
     }
 }

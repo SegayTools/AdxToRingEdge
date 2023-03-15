@@ -1,5 +1,9 @@
 ﻿using AdxToRingEdge.Core;
+using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.Utils;
 using CommandLine;
+using System.Diagnostics;
+using System.IO.Ports;
 
 Console.WriteLine("PROGRAM BEGIN.");
 
@@ -36,14 +40,30 @@ while (true)
 }
 
 /*
-using var serial = new SerialStreamWrapper("/dev/serial/by-id/usb-Artery_AT32_Composite_VCP_and_Keyboard_05F0312F7037-if00", 9600, Parity.None, 8, StopBits.One);
+using var serial = new SerialStreamWrapper("COM7", 115200, Parity.None, 8, StopBits.One);
 serial.Open();
-var buffer = new byte[9];
-serial.Write("{STAT}");
+
+var prevTime = DateTime.Now;
+var diffDurations = new CircularArray<double>(20);
+
+serial.OnEmptyWritableBufferReady += Serial_OnEmptyWritableBufferReady;
+serial.StartNonBufferEventDrive(14 / 2);
+
+void Serial_OnEmptyWritableBufferReady()
+{
+    var nowTime = DateTime.Now;
+    diffDurations.Enqueue((nowTime - prevTime).TotalMilliseconds);
+    prevTime = nowTime;
+
+    serial.Write("{000000000000}");
+}
+
+var status = new SerialStatusDebugTimer("OUTPUT", serial);
+status.Start();
+
 while (true)
 {
-    var read = serial.Read(buffer, 0, buffer.Length);
-    for (int i = 0; i < read; i++)
-        Console.Write((char)buffer[i]);
-}
-*/
+    Console.WriteLine($"ave interval: {diffDurations.Average():F2} ms");
+    Thread.Sleep(1000);
+}         
+*/                                                      

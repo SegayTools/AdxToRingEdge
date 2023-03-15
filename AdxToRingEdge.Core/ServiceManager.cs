@@ -1,7 +1,8 @@
 ﻿using AdxToRingEdge.Core.Keyboard;
 using AdxToRingEdge.Core.TouchPanel;
-using AdxToRingEdge.Core.TouchPanel.NativeTouchPanel;
-using AdxToRingEdge.Core.TouchPanel.TranslateTouchPanel;
+using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver;
+using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai;
+using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.ServiceManager>;
+using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
+using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch;
 
 namespace AdxToRingEdge.Core
 {
@@ -16,6 +20,52 @@ namespace AdxToRingEdge.Core
     {
         List<IService> services = new();
         private bool isRunning = false;
+
+        private bool TryCreateTouchPanelService(out TouchPanelService panelServiceEx)
+        {
+            IGameTouchPanelReciver GetGameTouchPanelReciver(ProgramArgumentOption option)
+            {
+                switch (option.OutType)
+                {
+                    case OutType.None:
+                        return null;
+                    case OutType.DxTouchPanel:
+                        return new DxTouchPanel(option);
+                    case OutType.FinaleTouchPanel:
+                        return new FinaleTouchPanel(option);
+                    case OutType.DxMemoryMappingFile:
+                        return new DxMemoryMappingFileReciver(option);
+                    default:
+                        throw new NotSupportedException($"Can't create reciver for type: {option.OutType}");
+                }
+            }
+
+            ITouchPanelDataReader GetTouchPanelDataReader(ProgramArgumentOption option)
+            {
+                switch (option.InType)
+                {
+                    case InType.None:
+                        return null;
+                    case InType.DxTouchPanel:
+                        return new DxTouchPanelDataReader(option);
+                    case InType.NativeTouchHid:
+                        return new NativeTouchDataReader(option);
+                    default:
+                        throw new NotSupportedException($"Can't create reader for type: {option.InType}");
+                }
+            }
+
+            var reciver = GetGameTouchPanelReciver(ProgramArgumentOption.Instance);
+            var reader = GetTouchPanelDataReader(ProgramArgumentOption.Instance);
+
+            panelServiceEx = default;
+
+            if (reciver is null || reader is null)
+                return false;
+
+            panelServiceEx = new TouchPanelService(reader, reciver);
+            return true;
+        }
 
         public void Start()
         {
@@ -30,11 +80,8 @@ namespace AdxToRingEdge.Core
             if (!string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxKeyboardByIdPath))
                 services.Add(new KeyboardService(ProgramArgumentOption.Instance));
 
-            if (!(string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxCOM) || string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.MaiCOM)))
-                services.Add(new TouchPanelService(ProgramArgumentOption.Instance));
-
-            if ((!string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxNativeTouchPath)) && !services.Any(x => x is TouchPanelService))
-                services.Add(new NativeTouchPanelService(ProgramArgumentOption.Instance));
+            if (TryCreateTouchPanelService(out var touchPanelServiceEx))
+                services.Add(touchPanelServiceEx);
 
             LogEntity.Debug($"------Service List-------");
             foreach (var service in services)

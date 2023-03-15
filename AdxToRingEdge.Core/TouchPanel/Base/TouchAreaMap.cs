@@ -16,7 +16,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
 
         public TouchAreaMap(IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> from, IReadOnlyDictionary<TouchArea, TouchAreaBinaryLocation> to)
         {
-            fromMap = from;
+            fromMap = from.Where(x => to.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
             toMap = to;
         }
 
