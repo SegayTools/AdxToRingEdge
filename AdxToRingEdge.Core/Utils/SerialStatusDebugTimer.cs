@@ -15,8 +15,7 @@ namespace AdxToRingEdge.Core.Utils
     {
         private readonly string serialDisplayName;
         private readonly SerialStreamWrapper serial;
-        private Task currentTask;
-        private CancellationTokenSource cancellationTokenSource;
+        private AbortableThread task;
 
         public SerialStatusDebugTimer(string serialDisplayName, SerialStreamWrapper serial)
         {
@@ -26,8 +25,8 @@ namespace AdxToRingEdge.Core.Utils
 
         public void Start()
         {
-            cancellationTokenSource = new CancellationTokenSource();
-            var task = Task.Run(() => OnTask(cancellationTokenSource.Token), cancellationTokenSource.Token);
+            task = new AbortableThread<SerialStatusDebugTimer>(OnTask);
+            task.Start();
         }
 
         private async void OnTask(CancellationToken cancellationToken)
@@ -58,8 +57,8 @@ namespace AdxToRingEdge.Core.Utils
 
         public void Stop()
         {
-            cancellationTokenSource.Cancel();
-            currentTask.Wait();
+            task?.Abort();
+            task = null;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
             if (task != null)
                 return;
             this.minBufferLimit = Math.Max(0, minBufferLimit);
-            task = new AbortableThread(OnEventDriving);
+            task = new AbortableThread<SerialStreamWrapper>(OnEventDriving);
             task.Start();
         }
 

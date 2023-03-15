@@ -40,7 +40,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
                 logger.User($"task != null");
                 return;
             }
-            task = new AbortableThread(OnProcess);
+            task = new AbortableThread<CommonMaiMaiTouchPanelDataReader>(OnProcess);
             task.Start();
         }
         private void OnProcess(CancellationToken cancellationToken)

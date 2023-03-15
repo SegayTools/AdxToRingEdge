@@ -105,7 +105,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
 
         public void Start()
         {
-            thread = new AbortableThread(OnStart);
+            thread = new AbortableThread<DummyApplication>(OnStart);
             thread.ApartmentState = ApartmentState.STA;
             thread.Start();
         }

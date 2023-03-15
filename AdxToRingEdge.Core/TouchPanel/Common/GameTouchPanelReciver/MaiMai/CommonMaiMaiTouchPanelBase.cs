@@ -35,7 +35,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 return;
             }
 
-            task = new AbortableThread(OnProcess);
+            task = new AbortableThread<CommonMaiMaiTouchPanelBase>(OnProcess);
             task.Start();
         }
 
@@ -45,7 +45,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 
             if (CreateSerial() is SerialStreamWrapper serial)
             {
-                enableSendTouchData = false;
+                enableSendTouchData = option.OutMaimaiNoWait;
                 this.serial = serial;
 
                 status = new SerialStatusDebugTimer(GetType().Name, serial);
@@ -77,6 +77,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 {
                     while (!token.IsCancellationRequested)
                     {
+                        if (serial.BytesToRead <= 0)
+                            continue;
                         var recvRead = serial.Read(recvBuffer, 0, recvBuffer.Length);
                         for (int i = 0; i < recvRead; i++)
                         {

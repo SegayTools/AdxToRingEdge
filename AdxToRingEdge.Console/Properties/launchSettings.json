@@ -3,7 +3,7 @@
     "AdxToRingEdge.Console": {
       "commandName": "Project",
       //"commandLineArgs": "--debug --adxCOM COM4 --maiCOM COM6 --debugSerialStatus --adxKeyboardByIdPath \"\" --adxNativeTouch \"\"  ",
-      "commandLineArgs": "--debug --debugSerialStatus --adxBaudRate 115200 --maiBaudRate 9600 --adxCOM \"COM9\" --maiCOM \"COM10\" --adxNativeTouch \"\" --adxKeyboardByIdPath \"\" "
+      "commandLineArgs": "--debug --debugSerialStatus --inType DxTouchPanel --outType FinaleTouchPanel --inTouchPanelBaudRate 115200 --outTouchPanelBaudRate 9600 --outMaimaiNoWait --inTouchPanelCOM \"COM3\" --outTouchPanelCOM \"COM10\" --adxKeyboardByIdPath \"\" "
     }
   }
 }       

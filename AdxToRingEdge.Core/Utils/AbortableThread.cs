@@ -12,11 +12,14 @@ namespace AdxToRingEdge.Core.Utils
     {
         private Thread thread;
         private CancellationTokenSource cancellationTokenSource;
+        private string threadName;
 
-        public AbortableThread(Action<CancellationToken> cancellableMethod)
+        public AbortableThread(string threadName, Action<CancellationToken> cancellableMethod)
         {
             cancellationTokenSource = new CancellationTokenSource();
             thread = new Thread(() => cancellableMethod?.Invoke(cancellationTokenSource.Token));
+            this.threadName = threadName;
+            thread.Name = threadName;
         }
 
         public ApartmentState ApartmentState
@@ -53,7 +56,7 @@ namespace AdxToRingEdge.Core.Utils
             }
             set
             {
-                thread.Name = value;
+                thread.Name = threadName = value;
             }
         }
 
@@ -70,6 +73,15 @@ namespace AdxToRingEdge.Core.Utils
             cancellationTokenSource.Cancel();
             thread?.Join();
             LogEntity.Debug($"Aborted thread {Name}.");
+        }
+    }
+
+
+    public class AbortableThread<T> : AbortableThread
+    {
+        public AbortableThread(Action<CancellationToken> cancellableMethod) : base(typeof(T).Name + "_Thread", cancellableMethod)
+        {
+
         }
     }
 }

@@ -14,6 +14,8 @@ namespace AdxToRingEdge.Core
     {
         #region TouchPanel
 
+        //----------------------------------------------
+
         [Option("inNativeTouchYRange", Required = false)]
         public string InNativeTouchYRange { get; set; } = "[18000,250]";
 
@@ -22,8 +24,6 @@ namespace AdxToRingEdge.Core
 
         [Option("inMemoryMappingFileName", Required = false)]
         public string InMemoryMappingFileName { get; set; } = "Sinmai_TouchPanel_1P";
-
-        //----------------------------------------------
 
         [Option("inType", Required = false)]
         public InType InType { get; set; } = InType.None;
@@ -53,6 +53,9 @@ namespace AdxToRingEdge.Core
 
         [Option("outTouchPanelBaudRate", Required = false)]
         public int OutTouchPanelBaudRate { get; set; } = 9600;
+
+        [Option("outMaimaiNoWait", Required = false)]
+        public bool OutMaimaiNoWait { get; set; } = false;
 
         [Option("outTouchPanelParity", Required = false)]
         public Parity OutTouchPanelParity { get; set; } = Parity.None;

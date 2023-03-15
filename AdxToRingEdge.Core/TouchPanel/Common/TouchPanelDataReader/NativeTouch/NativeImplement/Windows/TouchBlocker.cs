@@ -45,7 +45,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
 
                 var s = "TouchBlocker_" + new object().GetHashCode();
 
-                var thread = new AbortableThread(cancellationToken =>
+                var thread = new AbortableThread<TouchBlocker>(cancellationToken =>
                 {
                     fixed (char* p = s)
                     {
