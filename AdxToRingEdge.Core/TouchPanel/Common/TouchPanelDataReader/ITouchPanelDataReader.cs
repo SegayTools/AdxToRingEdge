@@ -12,7 +12,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader
     /// </summary>
     public interface ITouchPanelDataReader
     {
-        public delegate void TouchDataReceiveFunc(ReadOnlyTouchStateCollectionBase touchData);
+        public delegate void TouchDataReceiveFunc(TouchStateCollectionBase touchData);
         event TouchDataReceiveFunc OnTouchDataReceived;
 
         void Start();

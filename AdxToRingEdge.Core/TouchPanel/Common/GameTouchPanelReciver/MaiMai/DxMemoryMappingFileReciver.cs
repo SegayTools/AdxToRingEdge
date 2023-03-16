@@ -15,7 +15,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             this.option = option;
         }
 
-        public void SendTouchData(ReadOnlyTouchStateCollectionBase touchStates)
+        public void SendTouchData(TouchStateCollectionBase touchStates)
         {
             if (mmf == null)
                 return;

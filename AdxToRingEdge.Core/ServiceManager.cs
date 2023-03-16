@@ -63,7 +63,7 @@ namespace AdxToRingEdge.Core
             if (reciver is null || reader is null)
                 return false;
 
-            panelServiceEx = new TouchPanelService(reader, reciver);
+            panelServiceEx = new TouchPanelService(ProgramArgumentOption.Instance, reader, reciver);
             return true;
         }
 

@@ -48,8 +48,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 enableSendTouchData = option.OutMaimaiNoWait;
                 this.serial = serial;
 
-                status = new SerialStatusDebugTimer(GetType().Name, serial);
-                status.Start();
+                if (option.DebugSerialStatus)
+                {
+                    status = new SerialStatusDebugTimer(GetType().Name, serial);
+                    status.Start();
+                }
 
                 combinedStates = CreateTouchStates();
                 lastAppliedStates = CreateTouchStates();
@@ -111,6 +114,15 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                                         break;
 
                                     case (byte)TouchSensorStat.RatioDX:
+                                        {
+                                            var postData = new PostData(6);
+                                            recvDataBuffer.Fill(postData.Data);
+                                            postData.Data.Span[0] = 0x28;
+                                            postData.Data.Span[5] = 0x29;
+
+                                            postDataQueue.Enqueue(postData);
+                                        }
+                                        break;
                                     case (byte)TouchSensorStat.Ratio:
                                         {
                                             var postData = new PostData(6);
@@ -162,7 +174,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             combinedStates.ResetAllTouchStates();
         }
 
-        public virtual void SendTouchData(ReadOnlyTouchStateCollectionBase touchStates)
+        public virtual void SendTouchData(TouchStateCollectionBase touchStates)
         {
             lastAppliedStates.ResetAllTouchStates();
             lastAppliedStates.CopyFrom(touchStates);
@@ -178,7 +190,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 if (MemoryMarshal.TryGetArray<byte>(postData.Data, out var seg))
                 {
                     serial.Write(seg.Array, 0, postData.Data.Length);
-                    //logger.Debug($"post initalization data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => (char)x))}");
+                    logger.Debug($"post initalization data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => (char)x))}");
                 }
             }
             else if (enableSendTouchData)

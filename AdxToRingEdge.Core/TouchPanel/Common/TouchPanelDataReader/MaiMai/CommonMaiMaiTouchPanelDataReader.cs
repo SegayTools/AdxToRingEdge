@@ -58,8 +58,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
                 serial.Write("{STAT}");
                 logger.User($"OnProcess() sent STAT");
 
-                status = new SerialStatusDebugTimer(GetType().Name, serial);
-                status.Start();
+                if (option.DebugSerialStatus)
+                {
+                    status = new SerialStatusDebugTimer(GetType().Name, serial);
+                    status.Start();
+                }
 
                 var readBuffer = new VariableLengthArrayWrapper<byte>();
 

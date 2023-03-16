@@ -14,6 +14,9 @@ namespace AdxToRingEdge.Core
     {
         #region TouchPanel
 
+        [Option("enableTouchDataPostProcess", Required = false)]
+        public bool EnableTouchDataPostProcess { get; set; } = false;
+
         //----------------------------------------------
 
         [Option("inNativeTouchYRange", Required = false)]
@@ -95,7 +98,7 @@ namespace AdxToRingEdge.Core
         public bool IsDebug { get; set; }
 
         [Option("debugSerialStatus", Default = false, Required = false)]
-        public bool DebugSerialStatus { get; set; }
+        public bool DebugSerialStatus { get; set; } = false;
 
         #endregion
 

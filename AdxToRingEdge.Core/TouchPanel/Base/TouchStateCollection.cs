@@ -8,28 +8,25 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core.TouchPanel.Base
 {
-    public abstract class ReadOnlyTouchStateCollectionBase : IEnumerable<KeyValuePair<TouchArea, bool>>
+    public abstract class TouchStateCollectionBase : IEnumerable<KeyValuePair<TouchArea, bool>>
     {
         public abstract IEnumerator<KeyValuePair<TouchArea, bool>> GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public abstract bool GetTouchState(TouchArea touch);
-    }
-
-    public abstract class TouchStateCollectionBase : ReadOnlyTouchStateCollectionBase
-    {
         public abstract bool TrySetTouchState(TouchArea touch, bool isTouched);
         public abstract void ResetAllTouchStates();
 
         public abstract byte[] Dump();
 
-        public void CopyFrom(ReadOnlyTouchStateCollectionBase from)
+        public abstract bool GetTouchState(TouchArea touch);
+
+        public void CopyFrom(TouchStateCollectionBase from)
         {
             foreach (var touch in Enum.GetValues<TouchArea>())
                 TrySetTouchState(touch, from.GetTouchState(touch));
         }
 
-        public void CombineFrom(ReadOnlyTouchStateCollectionBase from)
+        public void CombineFrom(TouchStateCollectionBase from)
         {
             foreach (var touch in Enum.GetValues<TouchArea>())
                 TrySetTouchState(touch, GetTouchState(touch) | from.GetTouchState(touch));
@@ -118,6 +115,20 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
     {
         public FinaleTouchStateCollection() : base(DefaultTouchMapImpl.FinaleTouchMap, 14, 0x40)
         {
+
+        }
+
+        public override bool TrySetTouchState(TouchArea touch, bool isTouched)
+        {
+            if (touch == TouchArea.C1 || touch == TouchArea.C2)
+            {
+                var anotherCTouch = touch == TouchArea.C1 ? TouchArea.C2 : TouchArea.C1;
+                var anotherCState = GetTouchState(anotherCTouch);
+
+                return base.TrySetTouchState(TouchArea.C, isTouched || anotherCState);
+            }
+
+            return base.TrySetTouchState(touch, isTouched);
         }
     }
 
