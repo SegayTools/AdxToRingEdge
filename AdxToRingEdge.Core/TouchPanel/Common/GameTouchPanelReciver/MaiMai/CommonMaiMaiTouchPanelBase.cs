@@ -1,5 +1,6 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
 using AdxToRingEdge.Core.Utils;
+using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 using static AdxToRingEdge.Core.Log;
 
@@ -58,9 +59,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 lastAppliedStates = CreateTouchStates();
 
                 var touchDataBufferLength = lastAppliedStates.Dump().Length;
+                var fillDataLengthLimit = option.OutTouchPanelFillBufferLengthLimit < 0 ? (touchDataBufferLength / 2) : option.OutTouchPanelFillBufferLengthLimit;
 
+                logger.Debug($"fillDataLengthLimit: {fillDataLengthLimit}");
                 serial.OnEmptyWritableBufferReady += OnSerialWritable;
-                serial.StartNonBufferEventDrive(touchDataBufferLength / 2);
+                serial.StartNonBufferEventDrive(fillDataLengthLimit);
 
                 byte ch = 0;
                 var recvBuffer = new byte[64];

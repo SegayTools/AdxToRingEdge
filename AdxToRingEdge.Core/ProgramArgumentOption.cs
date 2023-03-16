@@ -72,6 +72,9 @@ namespace AdxToRingEdge.Core
         [Option("outTouchPanelCOM", Required = false)]
         public string OutTouchPanelCOM { get; set; } = "";
 
+        [Option("outTouchPanelFillBufferLengthLimit", Required = false)]
+        public int OutTouchPanelFillBufferLengthLimit { get; set; } = -1;
+
         [Option("outMemoryMappingFileName", Required = false)]
         public string OutMemoryMappingFileName { get; set; } = "Sinmai_TouchPanel_1P";
 
