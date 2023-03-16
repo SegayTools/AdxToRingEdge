@@ -1,4 +1,4 @@
-﻿using AdxToRingEdge.Core.TouchPanel.Base;
+﻿using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 
 namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver
 {

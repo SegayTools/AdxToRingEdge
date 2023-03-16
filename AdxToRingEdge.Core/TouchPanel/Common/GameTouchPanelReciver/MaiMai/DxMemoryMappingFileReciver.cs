@@ -1,4 +1,4 @@
-﻿using AdxToRingEdge.Core.TouchPanel.Base;
+﻿using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.Utils;
 using System;
 using System.IO.MemoryMappedFiles;

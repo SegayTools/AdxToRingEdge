@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 
 namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader
 {

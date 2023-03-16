@@ -1,4 +1,5 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader;

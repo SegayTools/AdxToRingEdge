@@ -1,4 +1,5 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.Utils;
 using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;

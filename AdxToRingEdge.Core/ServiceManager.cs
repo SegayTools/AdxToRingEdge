@@ -3,15 +3,9 @@ using AdxToRingEdge.Core.TouchPanel;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.ServiceManager>;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
-using AdxToRingEdge.Core.TouchPanel.Base;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch;
 
 namespace AdxToRingEdge.Core

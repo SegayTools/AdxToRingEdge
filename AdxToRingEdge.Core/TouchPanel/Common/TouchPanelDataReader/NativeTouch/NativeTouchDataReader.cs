@@ -16,6 +16,7 @@ using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.Base
 
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.NativeTouchDataReader>;
 using System.Runtime.CompilerServices;
+using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 
 namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
 {
