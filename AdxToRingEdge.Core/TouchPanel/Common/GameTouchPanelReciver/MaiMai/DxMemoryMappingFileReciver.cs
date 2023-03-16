@@ -23,7 +23,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             var state = 0UL;
 
             foreach (var pair in touchStates)
-                if (pair.Key < TouchArea.C && pair.Value)
+                if (pair.Value)
                     state |= 1UL << ((int)pair.Key);
 
             using var accessor = mmf.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Write);

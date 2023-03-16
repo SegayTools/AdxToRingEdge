@@ -51,7 +51,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             pathMap[TouchArea.B7] = new TouchAreaPath(new Vector2[] { new(274, 462), new(296, 406), new(313, 388), new(350, 388), new(409, 448), new(409, 486), new(382, 512), new(298, 512), new(274, 490) });
             pathMap[TouchArea.B8] = new TouchAreaPath(new Vector2[] { new(388, 313), new(405, 297), new(460, 274), new(489, 274), new(512, 298), new(512, 382), new(485, 409), new(449, 409), new(388, 349) });
 
-            pathMap[TouchArea.C] = new TouchAreaPath(new Vector2[] { new(455, 504), new(504, 455), new(575, 455), new(625, 504), new(625, 575), new(575, 625), new(504, 625), new(455, 575) });
+            pathMap[TouchArea.C1] = new TouchAreaPath(new Vector2[] { new(455, 504), new(504, 455), new(575, 455), new(625, 504), new(625, 575), new(575, 625), new(504, 625), new(455, 575) });
 
             var points = pathMap.Values.SelectMany(x => x.Points).ToArray();
             var minY = points.Select(x => x.Y).Min();

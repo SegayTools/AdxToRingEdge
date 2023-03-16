@@ -22,7 +22,7 @@ namespace AdxToRingEdge.Core.TouchPanel
             this.sender = sender;
 
             reader.OnTouchDataReceived += OnTouchDataReceived;
-            map = Enum.GetValues<TouchArea>().Where(x => x < TouchArea.C).GroupBy(x => x.ToString()[0]).ToDictionary(x => x.Key, x => x.OrderBy(y => y).ToArray());
+            map = Enum.GetValues<TouchArea>().GroupBy(x => x.ToString()[0]).ToDictionary(x => x.Key, x => x.OrderBy(y => y).ToArray());
         }
         
         private void OnTouchDataReceived(TouchStateCollectionBase touchData)

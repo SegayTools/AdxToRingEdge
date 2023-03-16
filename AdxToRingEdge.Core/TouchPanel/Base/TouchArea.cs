@@ -42,7 +42,5 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         E6,
         E7,
         E8,
-        C
     }
-
 }

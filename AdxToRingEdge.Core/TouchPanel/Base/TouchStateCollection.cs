@@ -120,12 +120,23 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
 
         public override bool TrySetTouchState(TouchArea touch, bool isTouched)
         {
-            if (touch == TouchArea.C1 || touch == TouchArea.C2)
+            if (touch == TouchArea.C2)
             {
-                var anotherCTouch = touch == TouchArea.C1 ? TouchArea.C2 : TouchArea.C1;
-                var anotherCState = GetTouchState(anotherCTouch);
+                var another = TouchArea.C1;
+                var anotherState = GetTouchState(another);
 
-                return base.TrySetTouchState(TouchArea.C, isTouched || anotherCState);
+                if (anotherState)
+                    return true;
+
+                return base.TrySetTouchState(touch, isTouched);
+                /*
+                var prevState = GetTouchState(TouchArea.C);
+                var curState = isTouched || anotherState;
+                if (prevState != curState)
+                    Log<FinaleTouchStateCollection>.Debug($"Touch C: {prevState} -> {curState}");
+
+                return base.TrySetTouchState(TouchArea.C, curState);
+                */
             }
 
             return base.TrySetTouchState(touch, isTouched);
@@ -138,7 +149,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
 
         public IEnumerable<TouchArea> GetVailedTouchAreas()
         {
-            return Enum.GetValues<TouchArea>().Where(x => x < TouchArea.C);
+            return Enum.GetValues<TouchArea>();
         }
 
         public override IEnumerator<KeyValuePair<TouchArea, bool>> GetEnumerator() => GetVailedTouchAreas().Select(x => KeyValuePair.Create(x, GetTouchState(x))).GetEnumerator();
