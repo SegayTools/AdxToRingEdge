@@ -1,5 +1,4 @@
-﻿using AdxToRingEdge.Core.TouchPanel.Base;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

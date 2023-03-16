@@ -1,5 +1,4 @@
-﻿using AdxToRingEdge.Core.Utils;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,9 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitsNet;
 
-using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Base.SerialStreamWrapper>;
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.Utils.SerialStreamWrapper>;
 
-namespace AdxToRingEdge.Core.TouchPanel.Base
+namespace AdxToRingEdge.Core.Utils
 {
     public class SerialStreamWrapper : IDisposable
     {
@@ -110,5 +109,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         }
 
         public void Close() => Dispose();
+
+        internal void ClearWriteBuffer()
+        {
+            serial.DiscardOutBuffer();
+        }
     }
 }

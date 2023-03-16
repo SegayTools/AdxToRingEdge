@@ -9,6 +9,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 {
     public abstract class CommonMaiMaiTouchPanelBase : IGameTouchPanelReciver
     {
+        public const int ReadBufferSize = 6;
+
         private ITaggedLog logger;
         private AbortableThread task;
         protected readonly ProgramArgumentOption option;
@@ -67,7 +69,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 serial.StartNonBufferEventDrive(fillDataLengthLimit);
 
                 byte ch = 0;
-                var recvBuffer = new byte[64];
+                var recvBuffer = new byte[ReadBufferSize];
                 var recvDataBuffer = new CircularArray<byte>(6);
 
                 void reset()
@@ -77,6 +79,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                     recvDataBuffer.Clear();
                     postDataQueue.Clear();
                     enableSendTouchData = false;
+                    serial.ClearWriteBuffer();
                     ResetTouchData();
                 }
 

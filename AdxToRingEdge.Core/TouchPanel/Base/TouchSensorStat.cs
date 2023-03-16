@@ -11,7 +11,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
         RSET = 0x45,
         HALT = 'L',//初始化开始
         Ratio = 't',//设置数值(对于旧框)
-        RatioDX = 0x72,//设置数值(对于新框)
+        RatioDX = 'r',//设置数值(对于新框)
         Sens = 'k',//设置数值
         STAT = 'A',//初始化完成，可以发送触摸数据
     }
