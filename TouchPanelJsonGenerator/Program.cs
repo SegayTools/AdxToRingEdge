@@ -1,9 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-using SimpleSvg2LineSegementInterpolater;
-using System.Drawing.Imaging;
-using System.IO;
+﻿using SimpleSvg2LineSegementInterpolater;
 using System.Text.Json;
-using System.Windows.Media;
 
 var svgFilePath = args.FirstOrDefault();
 

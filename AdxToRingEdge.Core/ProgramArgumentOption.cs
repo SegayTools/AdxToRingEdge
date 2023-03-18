@@ -70,6 +70,9 @@ namespace AdxToRingEdge.Core
         [Option("inNativeTouchPath", Required = false, HelpText = "(只在Linux生效)钦定一个标准触控Hid设备的读取路径")]
         public string InNativeTouchPath { get; set; } = "/dev/input/by-id/usb-Weida_Hi-Tech_CoolTouch®_System-event-if00";
 
+        [Option("inNativeTouchAreaPathJsonFilePath", Required = false, HelpText = "(只在Linux生效)钦定一个分区路径")]
+        public string InNativeTouchAreaPathJsonFilePath { get; set; }
+
         //-----------------
 
         [Option("outType", Required = false, HelpText = "输出触控数据类型,让应用知道需要发送什么类型的数据,或者模拟成什么类型的触控设备")]

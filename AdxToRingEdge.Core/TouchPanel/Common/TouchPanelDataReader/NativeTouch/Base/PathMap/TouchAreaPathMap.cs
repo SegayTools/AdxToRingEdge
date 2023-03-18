@@ -18,6 +18,6 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
         public abstract float BaseY { get; }
         public abstract float BaseX { get; }
 
-        public abstract bool CheckPointInPath(TouchArea a, Vector2 p);
+        public abstract bool CheckPointInPath(TouchArea prev, Vector2 p);
     }
 }

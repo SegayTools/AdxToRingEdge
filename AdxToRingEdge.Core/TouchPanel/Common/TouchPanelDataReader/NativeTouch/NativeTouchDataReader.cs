@@ -75,19 +75,28 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
             nativeXRange = ParseRangeString(option.InNativeTouchXRange);
             nativeYRange = ParseRangeString(option.InNativeTouchYRange);
 
-            LogEntity.Debug($"nativeRange: x{nativeXRange} y{nativeYRange}");
-            LogEntity.Debug($"pathMap offset:({pathMap.BaseX:F4},{pathMap.BaseY:F4}) size:({pathMap.Width:F4},{pathMap.Height:F4})");
-
             trackingTouchAreaMap = new();
             touchAreaCountMap = new();
             foreach (var area in Enum.GetValues<TouchArea>())
                 touchAreaCountMap[area] = 0;
 
-            pathMap = option.OutType switch
+            if (string.IsNullOrWhiteSpace(option.InNativeTouchAreaPathJsonFilePath))
             {
-                OutTouchType.DxMemoryMappingFile or OutTouchType.DxTouchPanel => new DxTouchAreaPathMap(),
-                OutTouchType.FinaleTouchPanel or _=> new FinaleTouchAreaPathMap(),
-            };
+                pathMap = option.OutType switch
+                {
+                    OutTouchType.DxMemoryMappingFile or OutTouchType.DxTouchPanel => new DxTouchAreaPathMap(),
+                    OutTouchType.FinaleTouchPanel or _ => new FinaleTouchAreaPathMap(),
+                };
+            }
+            else
+            {
+                var jsonContent = File.ReadAllText(option.InNativeTouchAreaPathJsonFilePath);
+                pathMap = CustomTouchAreaPathMap.CreateFromJsonContent(jsonContent);
+            }
+
+            LogEntity.Debug($"nativeRange: x{nativeXRange} y{nativeYRange}");
+            LogEntity.Debug($"pathMap: {pathMap.GetType().Name}");
+            LogEntity.Debug($"pathMap offset:({pathMap.BaseX:F4},{pathMap.BaseY:F4}) size:({pathMap.Width:F4},{pathMap.Height:F4})");
 
             touchStates = new GeneralTouchStateCollection();
             touchStates.ResetAllTouchStates();

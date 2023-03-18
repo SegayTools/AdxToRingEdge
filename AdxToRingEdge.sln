@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchPanelJsonGenerator", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{842EFEDE-B1C6-431B-98F4-57DF894C86C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SvgConverter", "Dependences\SvgToXaml\SvgConverter\SvgConverter.csproj", "{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSvg2LineSegementInterpolater", "Dependences\SimpleSvg2LineSegementInterpolater\src\SimpleSvg2LineSegementInterpolater\SimpleSvg2LineSegementInterpolater.csproj", "{90677783-64F3-4B5F-8FBE-A518DBAE5544}"
 EndProject
 Global
@@ -61,18 +59,6 @@ Global
 		{3A27BCBA-0073-45D9-9DFD-8CB75EB6E050}.Release|ARM32.Build.0 = Release|Any CPU
 		{3A27BCBA-0073-45D9-9DFD-8CB75EB6E050}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{3A27BCBA-0073-45D9-9DFD-8CB75EB6E050}.Release|ARM64.Build.0 = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|ARM32.ActiveCfg = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|ARM32.Build.0 = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|ARM32.ActiveCfg = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|ARM32.Build.0 = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8}.Release|ARM64.Build.0 = Release|Any CPU
 		{90677783-64F3-4B5F-8FBE-A518DBAE5544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{90677783-64F3-4B5F-8FBE-A518DBAE5544}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90677783-64F3-4B5F-8FBE-A518DBAE5544}.Debug|ARM32.ActiveCfg = Debug|Any CPU
@@ -90,7 +76,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{77CCE0DF-BA19-494D-8C45-7D4D237CA5E8} = {842EFEDE-B1C6-431B-98F4-57DF894C86C9}
 		{90677783-64F3-4B5F-8FBE-A518DBAE5544} = {842EFEDE-B1C6-431B-98F4-57DF894C86C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
