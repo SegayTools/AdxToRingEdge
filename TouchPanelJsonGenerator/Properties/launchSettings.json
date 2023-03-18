@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TouchPanelJsonGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "\"F:\\\\data.svg\""
+    }
+  }
+}

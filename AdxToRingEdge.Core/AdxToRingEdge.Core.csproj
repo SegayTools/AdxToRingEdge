@@ -13,11 +13,8 @@
     <PackageReference Include="Iot.Device.Bindings" Version="2.2.0" />
     <PackageReference Include="PInvoke.User32" Version="0.7.124" />
     <PackageReference Include="PInvoke.Win32" Version="0.7.124" />
+    <PackageReference Include="RawInput.Sharp" Version="0.0.4" />
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Dependences\rawinput-sharp\RawInput.Sharp\RawInput.Sharp.csproj" />
   </ItemGroup>
 
 </Project>

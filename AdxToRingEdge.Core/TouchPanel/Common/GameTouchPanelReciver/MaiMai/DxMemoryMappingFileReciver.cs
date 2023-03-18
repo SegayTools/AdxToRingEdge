@@ -33,7 +33,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
         public void Start()
         {
             mmf?.Dispose();
-            mmf = MemoryMappedFile.CreateOrOpen(option.InMemoryMappingFileName, 1024);
+            mmf = MemoryMappedFile.CreateOrOpen(option.OutMemoryMappingFileName, 1024);
         }
 
         public void Stop()

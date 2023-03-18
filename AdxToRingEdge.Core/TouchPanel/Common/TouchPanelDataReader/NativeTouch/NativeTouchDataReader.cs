@@ -17,6 +17,7 @@ using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.Base
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.NativeTouchDataReader>;
 using System.Runtime.CompilerServices;
 using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
+using static AdxToRingEdge.Core.ProgramArgumentOption;
 
 namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
 {
@@ -84,8 +85,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
 
             pathMap = option.OutType switch
             {
-                OutType.DxMemoryMappingFile or OutType.DxTouchPanel => new DxTouchAreaPathMap(),
-                OutType.FinaleTouchPanel or _=> new FinaleTouchAreaPathMap(),
+                OutTouchType.DxMemoryMappingFile or OutTouchType.DxTouchPanel => new DxTouchAreaPathMap(),
+                OutTouchType.FinaleTouchPanel or _=> new FinaleTouchAreaPathMap(),
             };
 
             touchStates = new GeneralTouchStateCollection();

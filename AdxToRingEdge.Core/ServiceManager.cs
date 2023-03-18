@@ -7,6 +7,7 @@ using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader;
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.ServiceManager>;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch;
+using static AdxToRingEdge.Core.ProgramArgumentOption;
 
 namespace AdxToRingEdge.Core
 {
@@ -21,13 +22,13 @@ namespace AdxToRingEdge.Core
             {
                 switch (option.OutType)
                 {
-                    case OutType.None:
+                    case OutTouchType.None:
                         return null;
-                    case OutType.DxTouchPanel:
+                    case OutTouchType.DxTouchPanel:
                         return new DxTouchPanel(option);
-                    case OutType.FinaleTouchPanel:
+                    case OutTouchType.FinaleTouchPanel:
                         return new FinaleTouchPanel(option);
-                    case OutType.DxMemoryMappingFile:
+                    case OutTouchType.DxMemoryMappingFile:
                         return new DxMemoryMappingFileReciver(option);
                     default:
                         throw new NotSupportedException($"Can't create reciver for type: {option.OutType}");
@@ -38,26 +39,26 @@ namespace AdxToRingEdge.Core
             {
                 switch (option.InType)
                 {
-                    case InType.None:
+                    case InTouchType.None:
                         return null;
-                    case InType.DxTouchPanel:
+                    case InTouchType.DxTouchPanel:
                         return new DxTouchPanelDataReader(option);
-                    case InType.NativeTouchHid:
+                    case InTouchType.NativeTouchHid:
                         return new NativeTouchDataReader(option);
                     default:
                         throw new NotSupportedException($"Can't create reader for type: {option.InType}");
                 }
             }
 
-            var reciver = GetGameTouchPanelReciver(ProgramArgumentOption.Instance);
-            var reader = GetTouchPanelDataReader(ProgramArgumentOption.Instance);
+            var reciver = GetGameTouchPanelReciver(Instance);
+            var reader = GetTouchPanelDataReader(Instance);
 
             panelServiceEx = default;
 
             if (reciver is null || reader is null)
                 return false;
 
-            panelServiceEx = new TouchPanelService(ProgramArgumentOption.Instance, reader, reciver);
+            panelServiceEx = new TouchPanelService(Instance, reader, reciver);
             return true;
         }
 
@@ -71,8 +72,8 @@ namespace AdxToRingEdge.Core
 
             services.Clear();
 
-            if (!string.IsNullOrWhiteSpace(ProgramArgumentOption.Instance.AdxKeyboardByIdPath))
-                services.Add(new KeyboardService(ProgramArgumentOption.Instance));
+            if (!string.IsNullOrWhiteSpace(Instance.AdxKeyboardByIdPath))
+                services.Add(new KeyboardService(Instance));
 
             if (TryCreateTouchPanelService(out var touchPanelServiceEx))
                 services.Add(touchPanelServiceEx);
