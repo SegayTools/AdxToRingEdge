@@ -205,7 +205,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 var touchData = combinedStates.Dump();
                 serial.Write(touchData, 0, touchData.Length);
 
-                logger.Debug($"post touch data : {string.Join(" ", touchData.Select(x => $"{x:x2}"))}");
+                //logger.Debug($"post touch data : {string.Join(" ", touchData.Select(x => $"{x:x2}"))}");
                 combinedStates.CopyFrom(lastAppliedStates);
             }
         }

@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deps", "Deps", "{842EFEDE-B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSvg2LineSegementInterpolater", "Dependences\SimpleSvg2LineSegementInterpolater\src\SimpleSvg2LineSegementInterpolater\SimpleSvg2LineSegementInterpolater.csproj", "{90677783-64F3-4B5F-8FBE-A518DBAE5544}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{9E7FE3B6-85A8-4460-AAAC-EC0EF04D8E0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{3A27BCBA-0073-45D9-9DFD-8CB75EB6E050} = {9E7FE3B6-85A8-4460-AAAC-EC0EF04D8E0A}
 		{90677783-64F3-4B5F-8FBE-A518DBAE5544} = {842EFEDE-B1C6-431B-98F4-57DF894C86C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

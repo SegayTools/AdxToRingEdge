@@ -137,9 +137,12 @@ namespace AdxToRingEdge.Core
 
             if (p.Errors.Any())
             {
-                Console.WriteLine($"Wrong args : {string.Join(", ", args)}");
-                Console.WriteLine(string.Join(Environment.NewLine, p.Errors.Select(x => x.ToString())));
-                return default;
+                if (!(p.Errors.Count() == 1 && p.Errors.First() is HelpRequestedError))
+                {
+                    Console.WriteLine($"Wrong args : {string.Join(", ", args)}");
+                    Console.WriteLine(string.Join(Environment.NewLine, p.Errors.Select(x => x.ToString())));
+                }
+                return false;
             }
 
             Instance = p.Value;

@@ -29,7 +29,7 @@ namespace AdxToRingEdge.Core
         private string BuildString(LogType logType, string tag, string message)
         {
             var time = DateTime.Now;
-            return $"{time.ToShortTimeString()} [{logType}:{Thread.CurrentThread.ManagedThreadId}] {tag}: {message}";
+            return $"{time} [{logType}:{Thread.CurrentThread.ManagedThreadId}] {tag}: {message}{Environment.NewLine}";
         }
 
         private void Output(LogType logType, string tag, string message)
@@ -45,9 +45,10 @@ namespace AdxToRingEdge.Core
                 LogType.Debug or _ => ConsoleColor.White,
             };
 
-            Console.WriteLine(fullMessageText);
-
+            Console.Write(fullMessageText);
             Console.ForegroundColor = b;
+
+            File.AppendAllText(@"ATRE.log", fullMessageText);
         }
 
         public void Debug(string tag, string message)

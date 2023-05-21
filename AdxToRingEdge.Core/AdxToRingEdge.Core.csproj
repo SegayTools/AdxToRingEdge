@@ -6,6 +6,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>embedded</DebugType>
     <Platforms>AnyCPU;ARM32</Platforms>
+    <NativeAOT>true</NativeAOT>
   </PropertyGroup>
 
   <ItemGroup>
