@@ -6,16 +6,8 @@ using System.Threading.Tasks;
 
 namespace AdxToRingEdge.Core.TouchPanel.Base
 {
-    public struct TouchAreaBinaryLocation
+    public record TouchAreaBinaryLocation(int PacketIdx, byte Bit)
     {
-        public TouchAreaBinaryLocation(int packetIdx, byte bit)
-        {
-            PacketIdx = packetIdx;
-            Bit = bit;
-        }
 
-        public int PacketIdx { get; set; }
-        public byte Bit { get; set; }
     }
-
 }

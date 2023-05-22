@@ -25,5 +25,4 @@ namespace AdxToRingEdge.Core.TouchPanel.Base
             return map.Select(x => KeyValuePair.Create(x.Key, isTouch(buffer, x.Value)));
         }
     }
-
 }
