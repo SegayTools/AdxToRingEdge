@@ -1,6 +1,7 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver;
 using AdxToRingEdge.Core.Utils;
+using AdxToRingEdge.Core.Utils.SerialDebug;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualBasic.FileIO;
@@ -10,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai.CommonMaiMaiTouchPanelDataReader>;
 
 namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
 {
@@ -30,8 +33,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
             this.touchDataBufferLength = touchDataBufferLength;
         }
 
-        protected SerialStreamWrapper CreateSerial()
-            => SerialHelper.SetupSerial(option.InTouchPanelCOM, option.InTouchPanelBaudRate, option.InTouchPanelParity, option.InTouchPanelDataBits, option.InTouchPanelStopBits);
+        protected Task<SerialStreamWrapper> CreateSerial(CancellationToken token)
+            => SerialHelper.SetupSerial(option.InTouchPanelCOM, option.InTouchPanelBaudRate, option.InTouchPanelParity, option.InTouchPanelDataBits, option.InTouchPanelStopBits, token);
 
         public void Start()
         {
@@ -43,10 +46,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
             task = new AbortableThread<CommonMaiMaiTouchPanelDataReader>(OnProcess);
             task.Start();
         }
-        private void OnProcess(CancellationToken cancellationToken)
+
+        private async void OnProcess(CancellationToken cancellationToken)
         {
             logger.User($"OnProcess() started.");
-            if (CreateSerial() is SerialStreamWrapper serial)
+            if ((await CreateSerial(cancellationToken)) is SerialStreamWrapper serial)
             {
                 logger.User($"OnProcess() Begin");
                 serial.Write("{RSET}");
@@ -60,7 +64,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
 
                 if (option.DebugSerialStatus)
                 {
-                    status = new SerialStatusDebugTimer(GetType().Name, serial);
+                    status = SerialStatusDebugTimerManager.CreateTimer(GetType().Name, serial);
                     status.Start();
                 }
 
@@ -121,6 +125,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
 
             status?.Stop();
             status = default;
+        }
+
+        public void PrintStatus()
+        {
+            LogEntity.User($"touchDataBufferLength = {touchDataBufferLength}");
         }
     }
 }

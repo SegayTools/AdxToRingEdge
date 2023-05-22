@@ -8,6 +8,8 @@ using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.ServiceManager>;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch;
 using static AdxToRingEdge.Core.ProgramArgumentOption;
+using AdxToRingEdge.Core.ComMapping;
+using AdxToRingEdge.Core.Utils.SerialDebug;
 
 namespace AdxToRingEdge.Core
 {
@@ -72,11 +74,16 @@ namespace AdxToRingEdge.Core
 
             services.Clear();
 
+            services.Add(SerialStatusDebugTimerManager.ServiceInstance);
+
             if (!string.IsNullOrWhiteSpace(Instance.AdxKeyboardByIdPath))
                 services.Add(new KeyboardService(Instance));
 
             if (TryCreateTouchPanelService(out var touchPanelServiceEx))
                 services.Add(touchPanelServiceEx);
+
+            if (Instance.InAimeCOM.Trim().Length * Instance.OutAimeCOM.Trim().Length > 0)
+                services.Add(new ComMappingService());
 
             LogEntity.Debug($"------Service List-------");
             foreach (var service in services)

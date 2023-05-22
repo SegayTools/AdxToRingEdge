@@ -6,15 +6,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.Utils.SerialStatusDebugTimer>;
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.Utils.SerialDebug.SerialStatusDebugTimer>;
 
-namespace AdxToRingEdge.Core.Utils
+namespace AdxToRingEdge.Core.Utils.SerialDebug
 {
     public class SerialStatusDebugTimer
     {
         private readonly string serialDisplayName;
         private readonly SerialStreamWrapper serial;
         private AbortableThread task;
+
+        public bool EnablePrint { get; set; } = false;
 
         public SerialStatusDebugTimer(string serialDisplayName, SerialStreamWrapper serial)
         {
@@ -44,7 +46,8 @@ namespace AdxToRingEdge.Core.Utils
                 var speedRead = (int)(Math.Abs(curTotalRead - prevTotalRead) / interval);
                 var speedWrite = (int)(Math.Abs(curTotalWrite - prevTotalWrite) / interval);
 
-                LogEntity.User($"Current {serialDisplayName} serial I/O buffer remain: [{serial?.BytesToRead} bytes / {serial?.BytesToWrite} bytes], speed: [{speedRead} b/s  /  {speedWrite} b/s]");
+                if (EnablePrint)
+                    LogEntity.User($"Current {serialDisplayName} serial I/O buffer remain: [{serial?.BytesToRead} bytes / {serial?.BytesToWrite} bytes], speed: [{speedRead} b/s  /  {speedWrite} b/s]");
 
                 prevTotalRead = curTotalRead;
                 prevTotalWrite = curTotalWrite;

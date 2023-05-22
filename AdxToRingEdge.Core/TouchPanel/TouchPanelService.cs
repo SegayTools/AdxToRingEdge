@@ -4,7 +4,10 @@ using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver;
 using AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader;
 using AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai;
+using Microsoft.Extensions.Logging.Abstractions;
 using UnitsNet;
+
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.TouchPanelService>;
 
 namespace AdxToRingEdge.Core.TouchPanel
 {
@@ -17,7 +20,7 @@ namespace AdxToRingEdge.Core.TouchPanel
         private TouchStateCollectionBase generic = new GeneralTouchStateCollection();
 
         public TouchPanelService(ProgramArgumentOption option, ITouchPanelDataReader reader, IGameTouchPanelReciver sender)
-        {   
+        {
             this.option = option;
             this.reader = reader;
             this.sender = sender;
@@ -25,7 +28,7 @@ namespace AdxToRingEdge.Core.TouchPanel
             reader.OnTouchDataReceived += OnTouchDataReceived;
             map = Enum.GetValues<TouchArea>().GroupBy(x => x.ToString()[0]).ToDictionary(x => x.Key, x => x.OrderBy(y => y).ToArray());
         }
-        
+
         private void OnTouchDataReceived(TouchStateCollectionBase touchData)
         {
             OnPostProcessTouchData(touchData);
@@ -103,7 +106,13 @@ namespace AdxToRingEdge.Core.TouchPanel
 
         public void PrintStatus()
         {
+            LogEntity.User($"--Print Sender {sender?.GetType().Name} Status--");
+            sender?.PrintStatus();
+            LogEntity.User($"----------------");
 
+            LogEntity.User($"--Print Reader {reader?.GetType().Name} Status--");
+            reader?.PrintStatus();
+            LogEntity.User($"----------------");
         }
 
         public void Start()

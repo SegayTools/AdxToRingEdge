@@ -213,6 +213,23 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
 
         public void PrintStatus()
         {
+            LogEntity.User($"deviceReader = {deviceReader?.GetType().Name}");
+            LogEntity.User($"touchStates = {touchStates}");
+            LogEntity.User($"pathMap = {pathMap}");
+            LogEntity.User($"nativeXRange = {nativeXRange}");
+            LogEntity.User($"nativeYRange = {nativeYRange}");
+            LogEntity.User($"Environment.OSVersion.Platform = {Environment.OSVersion.Platform}");
+
+            LogEntity.User($"Dump trackingTouchAreaMap:");
+            foreach (var pair in trackingTouchAreaMap)
+                LogEntity.User($"{pair.Key}\t{pair.Value}");
+            LogEntity.User("");
+
+            LogEntity.User($"Dump touchAreaCountMap:");
+            foreach (var pair in touchAreaCountMap)
+                LogEntity.User($"{pair.Key}\t{pair.Value}");
+            LogEntity.User("");
+
             deviceReader?.PrintStatus();
         }
     }

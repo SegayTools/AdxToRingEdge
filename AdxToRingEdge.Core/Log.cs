@@ -18,6 +18,11 @@ namespace AdxToRingEdge.Core
 
     internal class DefaultConsoleLog : ILog
     {
+        static DefaultConsoleLog()
+        {
+            File.Delete(@"ATRE.log");
+        }
+
         enum LogType
         {
             Debug,

@@ -11,5 +11,6 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver
         void Stop();
 
         void SendTouchData(TouchStateCollectionBase touchStates);
+        void PrintStatus();
     }
 }

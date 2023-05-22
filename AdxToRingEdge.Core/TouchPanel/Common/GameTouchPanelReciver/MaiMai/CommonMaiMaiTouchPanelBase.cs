@@ -1,6 +1,7 @@
 ﻿using AdxToRingEdge.Core.TouchPanel.Base;
 using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.Utils;
+using AdxToRingEdge.Core.Utils.SerialDebug;
 using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 using static AdxToRingEdge.Core.Log;
@@ -27,7 +28,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             this.option = option;
         }
 
-        protected abstract SerialStreamWrapper CreateSerial();
+        protected abstract Task<SerialStreamWrapper> CreateSerial(CancellationToken token);
 
         protected abstract TouchStateCollectionBase CreateTouchStates();
 
@@ -43,18 +44,18 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             task.Start();
         }
 
-        private void OnProcess(CancellationToken token)
+        private async void OnProcess(CancellationToken token)
         {
             logger.User($"OnProcess() started.");
 
-            if (CreateSerial() is SerialStreamWrapper serial)
+            if ((await CreateSerial(token)) is SerialStreamWrapper serial)
             {
                 enableSendTouchData = option.OutMaimaiNoWait;
                 this.serial = serial;
 
                 if (option.DebugSerialStatus)
                 {
-                    status = new SerialStatusDebugTimer(GetType().Name, serial);
+                    status = SerialStatusDebugTimerManager.CreateTimer(GetType().Name, serial);
                     status.Start();
                 }
 
@@ -217,6 +218,15 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 
             status?.Stop();
             status = default;
+        }
+
+        public void PrintStatus()
+        {
+            logger.User($"postDataQueue.Count = {postDataQueue.Count}");
+            logger.User($"enableSendTouchData = {enableSendTouchData}");
+            logger.User($"serial.IsOpen = {serial.IsOpen}");
+            logger.User($"lastAppliedStates = {lastAppliedStates}");
+            logger.User($"combinedStates = {combinedStates}");
         }
     }
 }

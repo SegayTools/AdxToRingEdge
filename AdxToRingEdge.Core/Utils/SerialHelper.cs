@@ -14,7 +14,7 @@ namespace AdxToRingEdge.Core.Utils
     {
         private static object locker = new object();
 
-        public static SerialStreamWrapper SetupSerial(string comName, int baudRate, Parity parity, int dataBits, StopBits stopBits)
+        public static async Task<SerialStreamWrapper> SetupSerial(string comName, int baudRate, Parity parity, int dataBits, StopBits stopBits, CancellationToken token)
         {
             lock (locker)
             {
@@ -27,19 +27,23 @@ namespace AdxToRingEdge.Core.Utils
                 LogEntity.Debug("-----------------------------");
             }
 
-            try
+            while (!token.IsCancellationRequested)
             {
+                try
+                {
+                    var inputSerial = new SerialStreamWrapper(comName, baudRate, parity, dataBits, stopBits);
+                    inputSerial.Open();
+                    LogEntity.User($"Setup serial {comName} successfully.");
+                    return inputSerial;
+                }
+                catch (Exception e)
+                {
+                    LogEntity.Error($"Can't setup serial {comName} : {e.Message}, It will retry....");
+                    await Task.Delay(1000);
+                }
+            }
 
-                var inputSerial = new SerialStreamWrapper(comName, baudRate, parity, dataBits, stopBits);
-                inputSerial.Open();
-                LogEntity.User($"Setup serial {comName} successfully.");
-                return inputSerial;
-            }
-            catch (Exception e)
-            {
-                LogEntity.Error($"Can't setup serial {comName} : {e.Message}\n{e.StackTrace}");
-                return default;
-            }
+            return default;
         }
     }
 }

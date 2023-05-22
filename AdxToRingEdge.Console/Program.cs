@@ -33,7 +33,7 @@ while (true)
             Environment.Exit(0);
             break;
         default:
-            var cmds = cmd.Split(' ');
+            var cmds = cmd.Split(' ').Select(x=>x.Trim()).ToArray();
             manager.TryProcessUserInput(cmds);
             break;
     }
@@ -58,7 +58,7 @@ void Serial_OnEmptyWritableBufferReady()
     serial.Write("{000000000000}");
 }
 
-var status = new SerialStatusDebugTimer("OUTPUT", serial);
+var status = SerialStatusDebugTimerManager.CreateTimer("OUTPUT", serial);
 status.Start();
 
 while (true)

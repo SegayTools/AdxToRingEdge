@@ -17,5 +17,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader
 
         void Start();
         void Stop();
+
+        void PrintStatus();
     }
 }

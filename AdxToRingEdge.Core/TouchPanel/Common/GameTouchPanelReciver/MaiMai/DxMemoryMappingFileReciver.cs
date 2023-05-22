@@ -3,6 +3,8 @@ using AdxToRingEdge.Core.Utils;
 using System;
 using System.IO.MemoryMappedFiles;
 
+using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai.DxMemoryMappingFileReciver>;
+
 namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 {
     public class DxMemoryMappingFileReciver : IGameTouchPanelReciver
@@ -13,6 +15,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
         public DxMemoryMappingFileReciver(ProgramArgumentOption option)
         {
             this.option = option;
+        }
+
+        public void PrintStatus()
+        {
+            LogEntity.User($"Status : {(mmf is not null ? "Running" : "Stopped")}.");
         }
 
         public void SendTouchData(TouchStateCollectionBase touchStates)

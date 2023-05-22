@@ -36,6 +36,40 @@ namespace AdxToRingEdge.Core
 
         #endregion
 
+        #region Aime Serial Mapping
+
+        [Option("inAimeBaudRate", Required = false)]
+        public int InAimeBaudRate { get; set; } = 38400;
+
+        [Option("inAimeParity", Required = false)]
+        public Parity InAimeParity { get; set; } = Parity.None;
+
+        [Option("inAimeDataBits", Required = false)]
+        public int InAimeDataBits { get; set; } = 8;
+
+        [Option("inAimeStopBits", Required = false)]
+        public StopBits InAimeStopBits { get; set; } = StopBits.One;
+
+        [Option("inAimeCOM", Required = false)]
+        public string InAimeCOM { get; set; } = "";
+
+        [Option("outAimeBaudRate", Required = false)]
+        public int OutAimeBaudRate { get; set; } = 38400;
+
+        [Option("outAimeParity", Required = false)]
+        public Parity OutAimeParity { get; set; } = Parity.None;
+
+        [Option("outAimeDataBits", Required = false)]
+        public int OutAimeDataBits { get; set; } = 8;
+
+        [Option("outAimeStopBits", Required = false)]
+        public StopBits OutAimeStopBits { get; set; } = StopBits.One;
+
+        [Option("outAimeCOM", Required = false)]
+        public string OutAimeCOM { get; set; } = "";
+
+        #endregion
+
         #region TouchPanel
 
         [Option("enableTouchDataPostProcess", Required = false, HelpText = "是否对触摸数据进行处理/优化")]

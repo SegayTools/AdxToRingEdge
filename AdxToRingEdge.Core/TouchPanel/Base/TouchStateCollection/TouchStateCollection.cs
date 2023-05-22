@@ -31,5 +31,8 @@ namespace AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection
             foreach (var touch in Enum.GetValues<TouchArea>())
                 TrySetTouchState(touch, GetTouchState(touch) | from.GetTouchState(touch));
         }
+
+        public override string ToString()
+            => $"{string.Join(", ", this.Where(x => x.Value).Select(x => x.Key))} || {string.Join(", ", this.Where(x => !x.Value).Select(x => x.Key))}";
     }
 }
