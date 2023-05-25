@@ -129,7 +129,35 @@ namespace AdxToRingEdge.Core.TouchPanel
 
         public bool TryProcessUserInput(string[] args)
         {
-            return false;
+            if (args.ElementAtOrDefault(0) != "touch")
+                return false;
+
+            switch (args.ElementAtOrDefault(1))
+            {
+                case "restart":
+                    var isResetSender = args.ElementAtOrDefault(2) == "sender";
+                    if (isResetSender)
+                    {
+                        var isRequestReadImmediatly = args.ElementAtOrDefault(3) == "fast";
+                        option.OutMaimaiNoWait = isRequestReadImmediatly;
+                        LogEntity.User($"Restart sender. isRequestReadImmediatly = {isRequestReadImmediatly}");
+                        sender?.Stop();
+                        sender?.Start();
+                        LogEntity.User($"Restart sender done.");
+                    }
+                    else
+                    {
+                        LogEntity.User($"Restart reader.");
+                        reader?.Stop();
+                        reader?.Start();
+                        LogEntity.User($"Restart reader done.");
+                    }
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
     }
 }

@@ -42,7 +42,9 @@ namespace AdxToRingEdge.Core.Utils.SerialDebug
 
         public void Stop()
         {
-
+            foreach (var value in timers.Values)
+                value.EnablePrint = false;
+            timers.Clear();
         }
 
         public bool TryProcessUserInput(string[] args)
@@ -66,8 +68,8 @@ namespace AdxToRingEdge.Core.Utils.SerialDebug
                     }
                 case "list":
                     LogEntity.User($"--Serial Status Timer List--");
-                    foreach (var key in timers.Keys)
-                        LogEntity.User($"*\t{key}");
+                    foreach (var pair in timers)
+                        LogEntity.User($"*\t{pair.Key}\t\t{pair.Value}");
                     LogEntity.User("");
                     break;
                 default:

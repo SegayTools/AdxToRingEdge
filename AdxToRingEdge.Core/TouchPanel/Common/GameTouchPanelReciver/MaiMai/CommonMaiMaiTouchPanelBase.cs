@@ -17,10 +17,13 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
         protected readonly ProgramArgumentOption option;
         private Queue<PostData> postDataQueue = new();
         private bool enableSendTouchData;
-        private SerialStreamWrapper serial;
         private SerialStatusDebugTimer status;
         private TouchStateCollectionBase lastAppliedStates;
         private TouchStateCollectionBase combinedStates;
+        private SerialStreamWrapper serial;
+        private TouchStateCollectionBase prevSentStates;
+        private bool sendDataImmediatly = false;
+        private DateTime prevSendTime;
 
         public CommonMaiMaiTouchPanelBase(ProgramArgumentOption option)
         {
@@ -50,7 +53,6 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 
             if ((await CreateSerial(token)) is SerialStreamWrapper serial)
             {
-                enableSendTouchData = option.OutMaimaiNoWait;
                 this.serial = serial;
 
                 if (option.DebugSerialStatus)
@@ -61,12 +63,15 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
 
                 combinedStates = CreateTouchStates();
                 lastAppliedStates = CreateTouchStates();
+                prevSentStates = CreateTouchStates();
+
+                sendDataImmediatly = false;
 
                 var touchDataBufferLength = lastAppliedStates.Dump().Length;
                 var fillDataLengthLimit = option.OutTouchPanelFillBufferLengthLimit < 0 ? (touchDataBufferLength / 2) : option.OutTouchPanelFillBufferLengthLimit;
 
                 logger.Debug($"fillDataLengthLimit: {fillDataLengthLimit}");
-                serial.OnEmptyWritableBufferReady += OnSerialWritable;
+                serial.OnEmptyWritableBufferReady += () => OnSerialWritable(token);
                 serial.StartNonBufferEventDrive(fillDataLengthLimit);
 
                 byte ch = 0;
@@ -83,6 +88,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                     serial.ClearWriteBuffer();
                     ResetTouchData();
                 }
+
+                reset();
+                enableSendTouchData = option.OutMaimaiNoWait;
+                logger.Debug($"init enableSendTouchData: {enableSendTouchData}");
 
                 try
                 {
@@ -171,6 +180,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
                 {
                     logger.Error($"OnProcess() throwed exception : {e.Message}\n{e.StackTrace}");
                 }
+                finally
+                {
+                    serial?.Dispose();
+                    this.serial = null;
+                }
             }
 
             logger.User($"OnProcess() finished.");
@@ -188,25 +202,63 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
             lastAppliedStates.CopyFrom(touchStates);
 
             combinedStates.CombineFrom(lastAppliedStates);
+            sendDataImmediatly = !prevSentStates.IsSameTouchStates(combinedStates);
         }
 
-        private void OnSerialWritable()
+        private void OnSerialWritable(CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+                return;
+            if (!(serial?.IsOpen ?? false))
+                return;
+
             if (postDataQueue.Count > 0)
             {
                 using var postData = postDataQueue.Dequeue();
                 if (MemoryMarshal.TryGetArray<byte>(postData.Data, out var seg))
                 {
-                    serial.Write(seg.Array, 0, postData.Data.Length);
+                    serial?.Write(seg.Array, 0, postData.Data.Length);
                     logger.Debug($"post initalization data : {string.Join(" ", seg.Array.Take(postData.Data.Length).Select(x => (char)x))}");
                 }
             }
             else if (enableSendTouchData)
             {
-                var touchData = combinedStates.Dump();
-                serial.Write(touchData, 0, touchData.Length);
+                /*
+                 如果轮到新的发送轮询，对比这一次要发送的数据和上一次发送的数据；
+                这样可以避免数据堵塞导致的延迟
+                 */
+                
+                var nowSendTime = DateTime.Now;
 
-                //logger.Debug($"post touch data : {string.Join(" ", touchData.Select(x => $"{x:x2}"))}");
+                void Send(TouchStateCollectionBase touchState)
+                {
+                    var touchData = touchState.Dump();
+                    serial?.Write(touchData, 0, touchData.Length);
+
+                    //logger.Debug($"post touch data : {string.Join(" ", touchData.Select(x => $"{x:x2}"))}");
+
+                    prevSendTime = nowSendTime;
+                    prevSentStates.CopyFrom(touchState);
+
+                    sendDataImmediatly = false;
+                }
+
+                if (!sendDataImmediatly)
+                {
+                    //如果和上一次发送的数据一样的话，可以先不发送(隔着1秒发送)
+                    if (nowSendTime - prevSendTime >= TimeSpan.FromSeconds(1))
+                    {
+                        //可以发送上一个数据避免旧框以为TouchSensor死了
+                        Send(prevSentStates);
+                    }
+                }
+                else
+                {
+                    //如果不一样的话，可以直接发送
+                    Send(combinedStates);
+                }
+
+                //忘记这玩意要干啥来着但看起来不用管.jpg
                 combinedStates.CopyFrom(lastAppliedStates);
             }
         }
@@ -224,7 +276,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.GameTouchPanelReciver.MaiMai
         {
             logger.User($"postDataQueue.Count = {postDataQueue.Count}");
             logger.User($"enableSendTouchData = {enableSendTouchData}");
-            logger.User($"serial.IsOpen = {serial.IsOpen}");
+            logger.User($"serial.IsOpen = {serial?.IsOpen}");
             logger.User($"lastAppliedStates = {lastAppliedStates}");
             logger.User($"combinedStates = {combinedStates}");
         }

@@ -110,6 +110,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.MaiMai
                     logger.Error($"End OnProcess() by exception : {e.Message}\n{e.StackTrace}");
                     Stop();
                 }
+                finally
+                {
+                    serial?.Dispose();
+                }
             }
             logger.User($"OnProcess() finish.");
         }

@@ -35,7 +35,7 @@ namespace AdxToRingEdge.Core.ComMapping
 
         public void PrintStatus()
         {
-            LogEntity.User($"Status: {((inSerial?.IsOpen ?? false) && (outSerial?.IsOpen ?? false) ? "Running":"Stopped")}.");
+            LogEntity.User($"Status: {((inSerial?.IsOpen ?? false) && (outSerial?.IsOpen ?? false) ? "Running" : "Stopped")}.");
         }
 
         public void Start()
@@ -104,28 +104,26 @@ namespace AdxToRingEdge.Core.ComMapping
             inSerialStatusTimer.Start();
             outSerialStatusTimer.Start();
 
-            void redirectTo(SerialStreamWrapper from, SerialStreamWrapper to, Span<byte> recvBuffer)
+            void redirectTo(SerialStreamWrapper from, SerialStreamWrapper to)
             {
-                if (!(from.IsOpen && to.IsOpen))
-                    return;
-
-                if (!token.IsCancellationRequested)
-                    return;
-
                 var recvSize = from.BytesToRead;
                 if (recvSize == 0)
                     return;
 
                 var buffer = ArrayPool<byte>.Shared.Rent(recvSize);
-                var actualRead = from.Read(buffer, 0, recvSize);
-
-                var sp = buffer.AsSpan().Slice(0, actualRead);
-                to.Write(buffer, 0, actualRead);
+                {
+                    var actualRead = from.Read(buffer, 0, recvSize);
+                    if (!token.IsCancellationRequested)
+                        to.Write(buffer, 0, actualRead);
+                }
                 ArrayPool<byte>.Shared.Return(buffer);
             }
 
-            inSerial.RegisterDataRecvDrive((rb) => redirectTo(inSerial, outSerial, rb));
-            outSerial.RegisterDataRecvDrive((rb) => redirectTo(outSerial, inSerial, rb));
+            while (!token.IsCancellationRequested)
+            {
+                redirectTo(inSerial, outSerial);
+                redirectTo(outSerial, inSerial);
+            }
         }
 
         public void Stop()

@@ -1,11 +1,11 @@
-﻿using AdxToRingEdge.Core;
+﻿
+using AdxToRingEdge.Core;
 using AdxToRingEdge.Core.TouchPanel.Base;
+using AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection;
 using AdxToRingEdge.Core.Utils;
 using CommandLine;
 using System.Diagnostics;
 using System.IO.Ports;
-
-Console.WriteLine("PROGRAM BEGIN.");
 
 if (!ProgramArgumentOption.Build(args))
     return;

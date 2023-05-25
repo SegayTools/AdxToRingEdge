@@ -132,14 +132,15 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch
 
         private void RemoveTouch(TouchEventArg touchArg)
         {
-            var area = trackingTouchAreaMap[touchArg.Id];
-            trackingTouchAreaMap.Remove(touchArg.Id);
+            if (trackingTouchAreaMap.TryGetValue(touchArg.Id,out var area))
+            {
+                trackingTouchAreaMap.Remove(touchArg.Id);
 
-            if (area is TouchArea a)
-                touchAreaCountMap[a] = touchAreaCountMap[a] - 1;
+                if (area is TouchArea a)
+                    touchAreaCountMap[a] = touchAreaCountMap[a] - 1;
+            }
 
             UpdateTouchData();
-
             OnTouchDataReceived?.Invoke(touchStates);
         }
 

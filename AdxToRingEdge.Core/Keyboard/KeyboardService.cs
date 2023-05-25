@@ -30,31 +30,33 @@ namespace AdxToRingEdge.Core.Keyboard
             Task.Run(() => OnKeyboardInputRead(cancelSource.Token), cancelSource.Token);
         }
 
-        private unsafe void OnKeyboardInputRead(CancellationToken cancellationToken)
+        private async void OnKeyboardInputRead(CancellationToken token)
         {
             LogEntity.Debug($"OnKeyboardInputRead() begin.");
 
             var file = new FileInfo(option.AdxKeyboardByIdPath);
             using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            cancellationToken.Register(() => fs?.Dispose());
+            token.Register(() => fs?.Dispose());
             currentInputStream = fs;
 
             LogEntity.Debug($"fs.CanRead = {fs.CanRead}");
 
             var buffer = new byte[24];
-            var readBuffer = new VariableLengthArrayWrapper<byte>();
+            var readBuffer = new byte[36];
             var fillIdx = 0;
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
                 if (!fs.CanRead)
-                    break;
+                    continue;
 
-                var read = fs.Read(readBuffer.Array, 0, readBuffer.Array.Length);
+                var read = await fs.ReadAsync(readBuffer, 0, readBuffer.Length, token);
+                if (token.IsCancellationRequested)
+                    continue;
 
                 for (int i = 0; i < read; i++)
                 {
-                    buffer[fillIdx++] = readBuffer.Array[i];
+                    buffer[fillIdx++] = readBuffer[i];
                     fillIdx = fillIdx % buffer.Length;
 
                     //mean that buffer is full.

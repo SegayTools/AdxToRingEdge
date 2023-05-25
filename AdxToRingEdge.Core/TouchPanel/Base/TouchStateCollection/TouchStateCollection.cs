@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,24 @@ namespace AdxToRingEdge.Core.TouchPanel.Base.TouchStateCollection
         {
             foreach (var touch in Enum.GetValues<TouchArea>())
                 TrySetTouchState(touch, GetTouchState(touch) | from.GetTouchState(touch));
+        }
+
+        public bool IsSameTouchStates(TouchStateCollectionBase other)
+        {
+            var otherDump = other.Dump();
+            var dump = Dump();
+
+            if (otherDump.Length != dump.Length)
+                return false;
+
+            for (int i = 0; i < dump.Length; i++)
+            {
+                var od = otherDump[i];
+                var d = dump[i];
+                if (od != d)
+                    return false;
+            }
+            return true;
         }
 
         public override string ToString()

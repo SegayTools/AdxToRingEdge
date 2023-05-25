@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using LogEntity = AdxToRingEdge.Core.Log<AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.NativeImplement.Linux.LinuxTouchDeviceReader>;
@@ -26,11 +27,10 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             }
         }
 
-        private CancellationTokenSource currentCancelTokenSource;
-        private Task currentTask;
+        private AbortableThread thread;
         private SlotContainer slotContainer;
 
-        public override bool IsRunning => currentTask is not null;
+        public override bool IsRunning => thread is not null;
 
         public override event OnTouchCallbackFunc OnTouchBegin;
         public override event OnTouchCallbackFunc OnTouchMove;
@@ -48,11 +48,11 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             }
 
             slotContainer = new(20);
-            currentCancelTokenSource = new CancellationTokenSource();
-            currentTask = Task.Run(() => OnProcess(currentCancelTokenSource.Token), currentCancelTokenSource.Token);
+            thread = new AbortableThread("LinuxTouchDeviceReader_OnProcess", OnProcess);
+            thread.Start();
         }
 
-        private void OnProcess(CancellationToken cancellation)
+        private async void OnProcess(CancellationToken cancellation)
         {
             LogEntity.User($"LinuxTouchDeviceReader.OnProcess() Begin");
 
@@ -60,15 +60,18 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             var buffer = new byte[24];
-            var readBuffer = new byte[1024];
+            var readBuffer = new byte[64];
             var fillIdx = 0;
 
             while (!cancellation.IsCancellationRequested)
             {
+                if (fs is null)
+                    continue;
                 if (!fs.CanRead)
+                    continue;
+                var read = await fs.ReadAsync(readBuffer, 0, readBuffer.Length, cancellation);
+                if (cancellation.IsCancellationRequested)
                     break;
-
-                var read = fs.Read(readBuffer, 0, readBuffer.Length);
 
                 for (int i = 0; i < read; i++)
                 {
@@ -103,24 +106,14 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             var code = (LinuxTouchEventCode)c;
 
             var raiseEvent = default(OnTouchCallbackFunc);
+            if (slotContainer is null)
+            {
+                LogEntity.Warn($"ProcessRawEventData() slotContainer is null");
+                return;
+            }
 
             switch (type)
             {
-                /*
-                case LinuxTouchEventType.EV_KEY:
-                    {
-                        LogEntity.Debug($"type:{t}({type})\tcode:{c}({code})\tvalue:{value}");
-
-                        if (code == LinuxTouchEventCode.BTN_TOUCH)
-                        {
-                            var isPress = value != 0;
-                            if (isPress != slotContainer.CurrentSlotEvent.IsPressed)
-                                raiseEvent = isPress ? OnTouchBegin : OnTouchEnd;
-                            slotContainer.CurrentSlotEvent.IsPressed = isPress;
-                        }
-                    }
-                    break;
-                */
                 case LinuxTouchEventType.EV_ABS:
                     {
                         switch (code)
@@ -171,11 +164,7 @@ namespace AdxToRingEdge.Core.TouchPanel.Common.TouchPanelDataReader.NativeTouch.
             if (!IsRunning)
                 return;
 
-            currentCancelTokenSource.Cancel();
-            currentTask.Wait();
-
-            currentTask = default;
-            currentCancelTokenSource = default;
+            thread.Abort();
             slotContainer = default;
         }
 

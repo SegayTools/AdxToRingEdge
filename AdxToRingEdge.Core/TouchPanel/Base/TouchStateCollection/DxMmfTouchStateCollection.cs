@@ -2,7 +2,8 @@
 {
     public class DxMmfTouchStateCollection : TouchStateCollectionBase
     {
-        public ulong state = 0UL;
+        private byte[] buffer;
+        private ulong state = 0UL;
 
         public IEnumerable<TouchArea> GetVailedTouchAreas()
         {
@@ -13,7 +14,7 @@
 
         public override byte[] Dump()
         {
-            return BitConverter.GetBytes(state);
+            return buffer;
         }
 
         public override bool GetTouchState(TouchArea touch)
@@ -24,11 +25,13 @@
         public override void ResetAllTouchStates()
         {
             state = 0;
+            buffer = BitConverter.GetBytes(state);
         }
 
         public override bool TrySetTouchState(TouchArea touch, bool isTouched)
         {
             state |= (isTouched ? 1UL : 0UL) << (int)touch;
+            buffer = BitConverter.GetBytes(state);
             return true;
         }
     }

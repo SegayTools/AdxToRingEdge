@@ -10,8 +10,13 @@ namespace AdxToRingEdge.Core.Utils
 {
     public class VariableLengthArrayWrapper<T> : IDisposable
     {
-        private T[] array = ArrayPool<T>.Shared.Rent(1024);
+        private T[] array;
         public T[] Array => array;
+
+        public VariableLengthArrayWrapper(int initSize = 1024)
+        {
+            array = ArrayPool<T>.Shared.Rent(initSize);
+        }
 
         public void CheckSize(int size)
         {

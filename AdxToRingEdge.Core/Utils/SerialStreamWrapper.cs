@@ -18,17 +18,15 @@ namespace AdxToRingEdge.Core.Utils
     {
         private SerialPort serial;
 
-        public int BytesToRead => serial.BytesToRead;
-        public int BytesToWrite => serial.BytesToWrite;
+        public int BytesToRead => serial?.BytesToRead ?? 0;
+        public int BytesToWrite => serial?.BytesToWrite ?? 0;
         private int prevBytesToWrite;
         private int curBytesToWrite;
         private int minBufferLimit;
         private AbortableThread task;
-        private OnDataRecvFunc callback;
         private readonly string portName;
 
         public delegate void OnEmptyWritableBufferReadyFunc();
-        public delegate void OnDataRecvFunc(Span<byte> recvBuffer);
         public event OnEmptyWritableBufferReadyFunc OnEmptyWritableBufferReady;
 
         public long TotalWriteBytes { get; private set; }
@@ -40,28 +38,6 @@ namespace AdxToRingEdge.Core.Utils
         {
             serial = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
             this.portName = portName;
-            serial.DataReceived += Serial_DataReceived;
-        }
-
-        private void Serial_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (callback is null)
-                return;
-
-            var recvSize = serial.BytesToRead;
-            if (recvSize == 0)
-                return;
-
-            var buffer = ArrayPool<byte>.Shared.Rent(recvSize);
-            var actualRead = Read(buffer, 0, recvSize);
-            var sp = buffer.AsSpan().Slice(0, actualRead);
-            callback(sp);
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
-
-        public void RegisterDataRecvDrive(OnDataRecvFunc callback)
-        {
-            this.callback = callback;
         }
 
         public void StartNonBufferEventDrive(int minBufferLimit = 1)
@@ -90,8 +66,13 @@ namespace AdxToRingEdge.Core.Utils
 
         public void Dispose()
         {
-            serial?.Dispose();
-            serial = null;
+            if (serial != null)
+            {
+                StopNonBufferEventDrive();
+                serial.Dispose();
+                serial = null;
+                LogEntity.Debug($"SerialWrapper {portName} has been disposed.");
+            }
         }
 
         public void Open()
@@ -118,6 +99,9 @@ namespace AdxToRingEdge.Core.Utils
 
         public int Read(byte[] buffer, int offset, int length)
         {
+            if (serial == null)
+                throw new Exception("Read with null serial object");
+
             var read = serial.Read(buffer, offset, length);
             TotalReadBytes += read;
             return read;
@@ -128,6 +112,9 @@ namespace AdxToRingEdge.Core.Utils
 
         public void Write(byte[] array, int offset, int length)
         {
+            if (serial == null)
+                throw new Exception("Write with null serial object");
+
             UpdateBefore();
             serial.Write(array, offset, length);
             UpdateAfter(length);
